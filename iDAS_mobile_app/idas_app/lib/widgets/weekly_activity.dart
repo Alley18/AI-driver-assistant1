@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'config.dart';
+import 'dart:async';
 
 Future<Map<String, Map<String, double>>> loadReportData() async {
-  final url = Uri.parse('http://192.168.0.113:5000/detailed-daily-report'); // flask
+  final url = Uri.parse('$baseUrl/weekly-activity'); // flask
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -40,21 +42,40 @@ class _DailyReportState extends State<DailyReport> {
     const Color(0xff8DD8FF),
     const Color(0xffBBFBFF),
   ];
+  Timer? _timer; // time variable
+  ChartType _chartType = ChartType.ring; // default chart type
 
   @override
   void initState() {
     super.initState();
     _loadDataforToday(widget.day);
-  }
 
-  Future<void> _loadDataforToday(String day) async {
-    final allData = await loadReportData();
-    setState(() {
-      dataMap = allData[day];
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _loadDataforToday(widget.day); // refresh
     });
   }
 
-  ChartType _chartType = ChartType.ring; // default chart type
+  @override
+  void dispose() {
+    _timer?.cancel(); // clean up timer when page closes
+    super.dispose();
+  }
+
+  Future<void> _loadDataforToday(String day) async {
+    try {
+      final allData = await loadReportData();
+      if (!mounted) return;
+      setState(() {
+        dataMap = allData[day];
+      });
+
+      debugPrint("Refreshed daily data at ${DateTime.now()} for day: $day");
+      debugPrint("Data: $dataMap");
+
+    } catch (e) {
+      debugPrint("Error fetching daily data: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

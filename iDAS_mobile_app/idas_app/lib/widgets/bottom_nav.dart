@@ -30,6 +30,10 @@ class BottomNav extends StatelessWidget{
           label: "Reports",
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.access_time),
+          label: "Weekly Activity",
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.settings),
           label: "Settings",
         ),

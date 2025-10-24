@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'iDAS Demo',
+      title: 'ADAMS Demo',
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),

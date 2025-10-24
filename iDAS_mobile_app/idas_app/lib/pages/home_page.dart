@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:idas_app/pages/real_time_status_page.dart';
+import 'package:idas_app/pages/reports_page.dart';
 import 'package:idas_app/pages/settings_page.dart';
-import 'package:idas_app/pages/weekly_monthly_reports_page.dart';
-import 'package:idas_app/pages/daily_report_event_page.dart';
+import 'package:idas_app/pages/weekly_activity_page.dart';
 import 'package:idas_app/widgets/bottom_nav.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,8 +16,9 @@ class _HomePageState extends State<HomePage> {
   // bottom navigation bar
   int _selectedIndex = 0;
   final List<Widget> _pages = [
+    const RealTimeStatus(),
+    const ReportsPage(),
     const DailyReportAndEvent(),
-    const WeeklyMonthlyReports(),
     const SettingsPage(),
   ];
 
@@ -37,9 +39,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.lightBlue,
         centerTitle: true,
         title: Text(
-          "iDAS: Driver Alert Monitoring System",
+          "ADAMS",
           style: TextStyle(
-            fontSize: 21,
+            fontSize: 30,
             color: Colors.white,
           ),
         ),

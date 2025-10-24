@@ -61,13 +61,13 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "iDAS",
+                "ADAMS",
                 style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4), // spacw
               const Text(
-                "Driver Alert Monitoring System",
-                style: TextStyle(fontSize: 22),
+                "Advanced Driver Alertness Monitoring System",
+                style: TextStyle(fontSize: 17),
               ),
               const SizedBox(height: 24),
 

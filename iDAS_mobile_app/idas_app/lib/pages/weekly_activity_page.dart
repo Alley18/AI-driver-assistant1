@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:idas_app/widgets/event_log_list.dart';
-import 'package:idas_app/widgets/daily_report.dart';
+import 'package:idas_app/widgets/weekly_activity.dart';
 
 class DailyReportAndEvent extends StatefulWidget {
   const DailyReportAndEvent({super.key});
@@ -44,7 +44,7 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
         children: [
           const SizedBox(height: 16),
           const Text(
-            "Daily Report",
+            "Weekly Activity",
             style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
@@ -93,7 +93,7 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                        "Event Log",
+                        "Event Logs",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

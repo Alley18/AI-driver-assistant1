@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'config.dart';
+import 'dart:async';
 
 class MonthlyAlertsChart extends StatefulWidget {
   final List<String> timeLabels;
@@ -21,15 +23,16 @@ class _MonthlyAlertChartState extends State<MonthlyAlertsChart>
   late AnimationController _animationController;
   late Animation<double> _animation;
   bool _isLoading = true;
+  Timer? _timer;
 
   // get data using flask api
   Future<void> _loadStoredData() async {
-    final url = Uri.parse('http://192.168.0.113:5000/monthly-data'); // flask
+    final url = Uri.parse('$baseUrl/monthly-data'); // flask
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);
-
+      if (!mounted) return;
       setState(() {
         _values = jsonData.values.map((v) => v as int).toList();
         _labels = jsonData.keys.toList();
@@ -61,11 +64,16 @@ class _MonthlyAlertChartState extends State<MonthlyAlertsChart>
     _loadStoredData().then((_) {
       _animationController.forward(); // start animation
     });
+
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer){
+      _loadStoredData();
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _timer?.cancel();
     super.dispose();
   } // prevent memory leak
 
@@ -81,7 +89,6 @@ class _MonthlyAlertChartState extends State<MonthlyAlertsChart>
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      // Remove decoration completely, or make transparent
       color: Colors.transparent, // transparent background
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

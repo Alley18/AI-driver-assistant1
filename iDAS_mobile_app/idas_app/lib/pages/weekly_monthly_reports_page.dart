@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idas_app/widgets/summary.dart';
 import '../widgets/weekly_report.dart';
 import '../widgets/monthly_report.dart';
 
@@ -81,28 +82,11 @@ class _WeeklyMonthlyReportsState extends State<WeeklyMonthlyReports> {
         // Summary
         Text(
           "Summary",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ), 
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            _currentpage == 0
-                ? "This week: Alerts peaked midweek, with Friday having the most alerts."
-                : "This year: Summer months show higher alerts, while winter remains calmer.",
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.left,
-          ),
-        ),
+        AlertSummary(isWeekly: _currentpage == 0),
       ],
     );
   }
