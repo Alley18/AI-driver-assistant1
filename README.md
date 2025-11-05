@@ -2,8 +2,8 @@
 Advanced Driver Alertness Monitoring System
 
 ### Department Team
-- sduphy [ test ]
-- monedxy
-- meiju
-- neku
-- soob
+- sduphy  [ Electrical Engineer / Leader ]
+- monedxy [ Hardware Engineer ]
+- melju   [ Front End Developer ]
+- neku    [ Back End Developer ]
+- soob    [ AI/ML Engineer ]
