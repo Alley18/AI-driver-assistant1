@@ -1,5 +1,5 @@
 # ADAMS Mobile Application
-ADAMS mobile app delivers driver alertness data from hardware and backend systems through an intuitive interface, using charts and event logs for easy visualization.
+ADAMS app delivers driver alertness data from hardware and backend systems through an intuitive interface, using charts and event logs for easy visualization.
 
 # Important Features
 ## Real-time Status
