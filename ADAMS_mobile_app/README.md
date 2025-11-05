@@ -1,6 +1,7 @@
 # ADAMS Mobile Application
-A mobile application for ADAMS (Advanced Driver Alertness Monitoring System) that delivers hardware and backend data through a simple, user-friendly interface. 
+ADAMS mobile app delivers driver alertness data from hardware and backend systems through an intuitive interface, using charts and event logs for easy visualization.
 
+# Important Features
 ## Real-time Status
 The main page displays the driver's real-time status for monitoring.
 * Driver's Status: Normal, Distracted or Drowsy
