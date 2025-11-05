@@ -1,2 +1,4 @@
-# iDAS Mobile Application
-A mobile application for iDAS (Intelligent Driver Alertness System)
+# ADAMS Mobile Application
+A mobile application for ADAMS (Advanced Driver Alertness Monitoring System)
+
+## Homepage
