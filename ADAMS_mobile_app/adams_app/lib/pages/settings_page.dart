@@ -1,51 +1,91 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:idas_app/pages/device_link_page.dart';
 import 'package:idas_app/pages/login_page.dart';
+import 'package:idas_app/pages/session_log_page.dart';
 
 class SettingsPage extends StatefulWidget {
-  final String? username;
-  const SettingsPage({super.key, this.username});
+  const SettingsPage({super.key}); // no username needed
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String? username;
+  String? _username;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUser(); // load username from Hive
+    _loadSession();
   }
 
-  Future<void> _loadUser() async {
+  // ------ load current user info ------ //
+  Future<void> _loadSession() async {
     final sessionBox = await Hive.openBox('session');
     setState(() {
-      username = sessionBox.get('currentUser');
+      _username = sessionBox.get('currentUser');
+      _isLoading = false;
     });
   }
+  // ------------------------------------ //
 
+  // ------- function to logout (clear current session info) ------ //
   Future<void> _logout(BuildContext context) async {
     final sessionBox = await Hive.openBox('session');
-    await sessionBox.delete('currentUser');
+    await sessionBox.clear(); // clear all session data
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const LoginPage()),
     );
   }
+  // -------------------------------------------------------------- //
 
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // pushes bottom text down
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.add_circle_outline, size: 25),
+                  title: const Text(
+                    "Link to your hardware",
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const DeviceLinkPage()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.analytics_outlined, size: 25),
+                  title: const Text(
+                    "Session Logs",
+                    style: TextStyle(fontSize: 24),
+                  ),
+                   onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SessionLogPage()),
+                    );
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.logout, size: 25),
                   title: const Text("Log out", style: TextStyle(fontSize: 24)),
@@ -53,26 +93,25 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.contact_page, size: 25),
-                  title: const Text("Contact support", style: TextStyle(fontSize: 24)),
+                  title: const Text(
+                    "Contact support",
+                    style: TextStyle(fontSize: 24),
+                  ),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Support page coming soon!")),
+                      const SnackBar(
+                        content: Text("Support page coming soon!"),
+                      ),
                     );
                   },
                 ),
               ],
             ),
-            // bottom welcome message
             Padding(
               padding: const EdgeInsets.only(bottom: 32),
               child: Text(
-                username != null
-                    ? "Welcome, $username!"
-                    : "Welcome!",
-                style: const TextStyle(
-                  fontSize: 30,
-                  color: Colors.blueGrey,
-                ),
+                _username != null ? "Welcome, $_username!" : "Welcome!",
+                style: const TextStyle(fontSize: 30, color: Colors.blueGrey),
               ),
             ),
           ],

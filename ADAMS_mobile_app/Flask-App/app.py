@@ -4,9 +4,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# 🧠 Mock data by user
+# mock user db
+users = {
+    "adams": "u001"
+}
+
+# Mock data by user
 mock_data = {
-    "adams": {
+    "u001": {
         "event_log_list": {
             "Monday": [
                 {"time": "10:00", "type": "Distracted"},
@@ -47,108 +52,126 @@ mock_data = {
 
 @app.route('/event-log-list')
 def get_event_log_list():
-    username = request.args.get("username", None)
+    user_id = request.args.get("userID", None)
     
     # If no username provided
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not user_id:
+        return jsonify({"error": "User ID required"}), 400
     
     # Check if user exists in mock_data
-    if username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # Return user-specific data
-    return jsonify(mock_data[username]["event_log_list"])
+    return jsonify(mock_data[user_id]["event_log_list"])
 
 @app.route('/weekly-activity')
 def get_weekly_activity():
-    username = request.args.get("username", None)
+    user_id = request.args.get("userID", None)
     
     # If no username provided
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not user_id:
+        return jsonify({"error": "User ID required"}), 400
     
     # Check if user exists in mock_data
-    if username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # Return user-specific data
-    return jsonify(mock_data[username]["weekly_activity"])
+    return jsonify(mock_data[user_id]["weekly_activity"])
 
 @app.route('/real-time-status')
 def get_real_time_status():
-    username = request.args.get("username", None)
+    user_id = request.args.get("userID", None)
     
     # If no username provided
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not user_id:
+        return jsonify({"error": "User ID required"}), 400
     
     # Check if user exists in mock_data
-    if username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # Return user-specific data
-    return jsonify(mock_data[username]["real_time_status"])
+    return jsonify(mock_data[user_id]["real_time_status"])
 
 @app.route('/current-events-list')
 def get_current_events_list():
-    username = request.args.get("username", None)
+    user_id = request.args.get("userID", None)
     
     # If no username provided
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not user_id:
+        return jsonify({"error": "User ID required"}), 400
     
     # Check if user exists in mock_data
-    if username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # Return user-specific data
-    return jsonify(mock_data[username]["current_events_list"])
+    return jsonify(mock_data[user_id]["current_events_list"])
 
 @app.route('/thisweek')
 def get_this_week():
-    username = request.args.get("username")
-    category = request.args.get("category")  # optional, if needed
+    user_id = request.args.get("userID")
+    category = request.args.get("category") 
     
-    if not username or username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if not user_id or user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # category could be used for special filtering if needed
-    return jsonify(mock_data[username]["this_week"])
+    return jsonify(mock_data[user_id]["this_week"])
 
 @app.route('/thismonth')
 def get_this_month():
-    username = request.args.get("username")
-    category = request.args.get("category")  # optional, if needed
+    user_id = request.args.get("userID")
+    category = request.args.get("category")
     
-    if not username or username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if not user_id or user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # category could be used for special filtering if needed
-    return jsonify(mock_data[username]["this_month"])
+    return jsonify(mock_data[user_id]["this_month"])
 
 @app.route('/current-driver-status')
 def get_driver_status():
-    username = request.args.get("username", None)
+    user_id = request.args.get("userID", None)
     
     # If no username provided
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not user_id:
+        return jsonify({"error": "User ID required"}), 400
     
     # Check if user exists in mock_data
-    if username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
     
     # Return user-specific data
-    return jsonify(mock_data[username]["current_driver_status"])
+    return jsonify(mock_data[user_id]["current_driver_status"])
 
 @app.route('/get-data', methods=['POST'])
 def get_data():
     data = request.get_json()
-    username = data.get('username')
+    user_id = data.get('userID')
 
-    if username not in mock_data:
-        return jsonify({"error": "User not found"}), 404
+    if user_id not in mock_data:
+        return jsonify({"error": "User ID not found"}), 404
 
-    return jsonify(mock_data[username])
+    return jsonify(mock_data[user_id])
+
+# ------ receive username, send user id ------ #
+@app.route('/get_user_id', methods=['POST'])
+def get_user_id():
+    data = request.get_json()
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"error": "Username missing"}), 400
+
+    # Return existing ID or create a new one dynamically
+    if username not in users:
+        users[username] = f"u{len(users) + 1:03}"
+
+    return jsonify({"user_id": users[username]})
+
+
+
 

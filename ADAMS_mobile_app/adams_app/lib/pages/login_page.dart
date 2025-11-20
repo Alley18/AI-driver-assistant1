@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:idas_app/pages/home_page.dart';
 import 'package:idas_app/pages/sign_up_page.dart';
+import '../widgets/config.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,82 +14,99 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _usernameOrEmailController =
+      TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
-  late Box _userBox;
-
-  @override
-  void initState() {
-    super.initState();
-    _initHive();
+  // ------ hive to save current user info ------ //
+  Future<void> saveSession(String username, String userID) async {
+    final sessionBox = await Hive.openBox('session');
+    await sessionBox.put('currentUser', username);
+    await sessionBox.put('userID', userID);
   }
+  // -------------------------------------------- //
 
-  Future<void> _initHive() async {
-    await Hive.initFlutter();
-    _userBox = await Hive.openBox('users');
-    setState(() {});
-  }
-
+  // ------ push sign up button to go to sign up page ------ //
   void _signup() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const SignUpPage()),
     );
   }
+  // ------------------------------------------------------- //
 
+  // ------ login function ------ //
   void _login() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final input = _usernameController.text.trim();
+    setState(() => _isLoading = true);
+
+    final usernameOrEmail = _usernameOrEmailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (_userBox.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Welcome new driver! Sign up to ADAMS."),
-          backgroundColor: Colors.red,
-        ),
+    try {
+      final url = Uri.parse('$baseUrl/login-route');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': usernameOrEmail, 'password': password}),
       );
-      return;
-    }
 
-    // Find user (by username or email)
-    final user = _userBox.values.cast<Map>().firstWhere(
-      (u) => u['username'] == input || u['email'] == input,
-      orElse: () => {},
-    );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final userID = data['user_id'];
+        final username = data['username'];
 
-    if (user.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("User not found. Please sign up."),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
+        await saveSession(username, userID);
 
-    if (user['password'] == password) {
-      final sessionBox = await Hive.openBox('session');
-      await sessionBox.put('currentUser', input);
-
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage(username: input)),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Incorrect password."),
-          backgroundColor: Colors.red,
-        ),
-      );
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => HomePage(username: username, userID: userID),
+          ),
+        );
+      } else if (response.statusCode == 404) {
+        _showSnackBar("Login failed - ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Login error: $e");
+      _showSnackBar("Network error. Please try again later.");
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
+  // ---------------------------- //
 
+  // ------ helper function to display error messages ------ //
+  void _showSnackBar(String msg) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+  }
+  // ------------------------------------------------------- //
+
+  void _skipLogin() async {
+    const dummyUsername = "Guest";
+    const dummyUserID = "0"; // or any string ID
+
+    // Optionally save a session so app thinks a user is logged in
+    final sessionBox = await Hive.openBox('session');
+    await sessionBox.put('currentUser', dummyUsername);
+    await sessionBox.put('userID', dummyUserID);
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HomePage(username: dummyUsername, userID: dummyUserID),
+      ),
+    );
+  }
+
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,9 +129,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 24),
 
-              // Username
               TextFormField(
-                controller: _usernameController,
+                controller: _usernameOrEmailController,
                 decoration: InputDecoration(
                   labelText: "Username or Email",
                   border: OutlineInputBorder(
@@ -123,7 +142,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 8),
 
-              // Password
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
@@ -138,11 +156,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 24),
 
-              // Login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightBlue,
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -150,30 +167,38 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(fontSize: 18, color: Colors.black),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
+                        )
+                      : const Text(
+                          "Login",
+                          style: TextStyle(fontSize: 18, color: Colors.black),
+                        ),
                 ),
               ),
 
               const SizedBox(height: 8),
-
-              // Divider
               Row(
-                children: [
-                  const Expanded(child: Divider(thickness: 1, color: Colors.grey)),
-                  const Padding(
+                children: const [
+                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text("or sign up",
-                        style: TextStyle(color: Colors.grey, fontSize: 15)),
+                    child: Text(
+                      "or sign up",
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                    ),
                   ),
-                  const Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                  Expanded(child: Divider(thickness: 1, color: Colors.grey)),
                 ],
               ),
               const SizedBox(height: 8),
 
-              // Sign Up button
               SizedBox(
                 width: 150,
                 height: 40,
@@ -191,6 +216,27 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
+
+              // ------ skip login for debug ------ //
+              // const SizedBox(height: 8),
+              // SizedBox(
+              //   width: 150,
+              //   height: 40,
+              //   child: ElevatedButton(
+              //     onPressed: _skipLogin,
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.orange.shade300,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(12),
+              //       ),
+              //     ),
+              //     child: const Text(
+              //       "Skip Login",
+              //       style: TextStyle(fontSize: 16, color: Colors.black),
+              //     ),
+              //   ),
+              // ),
+              // ---------------------------------- //
             ],
           ),
         ),

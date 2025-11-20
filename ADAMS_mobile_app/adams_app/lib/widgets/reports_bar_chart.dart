@@ -1,18 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:hive/hive.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'config.dart';
 
 class ReportsBarChart extends StatefulWidget {
   final String category; // from dropdown
-  final String? username;
-  const ReportsBarChart({
-    super.key,
-    required this.category,
-    required this.username,
-  });
+  const ReportsBarChart({super.key, required this.category});
 
   @override
   State<ReportsBarChart> createState() => _ReportsBarChartState();
@@ -25,33 +21,28 @@ class _ReportsBarChartState extends State<ReportsBarChart>
     "This Month": "thismonth",
   };
 
-  List<Color> barColors = [Colors.lightBlue, Colors.blue];
   List<int> _values = [];
   late List<String> _labels;
   bool _isLoading = true;
+  String? _userID;
 
   late AnimationController _animationController;
   late Animation<double> _animation;
 
   int getCurrentIndex() {
     final today = DateTime.now();
-
     if (widget.category == "This Week") {
-      // Monday = 1, Sunday = 7
-      return today.weekday - 1; // 0-based index for Mon-Sun
+      return today.weekday - 1;
     } else {
-      // For month, find which interval today falls into
       final day = today.day;
       for (int i = 0; i < _labels.length; i++) {
         final parts = _labels[i].split('-');
         final start = int.parse(parts[0]);
         final end = int.parse(parts[1]);
-        if (day >= start && day <= end) {
-          return i;
-        }
+        if (day >= start && day <= end) return i;
       }
     }
-    return -1; // default if not found
+    return -1;
   }
 
   @override
@@ -68,75 +59,25 @@ class _ReportsBarChartState extends State<ReportsBarChart>
       curve: Curves.easeOut,
     );
 
-    _loadStoredData();
+    _loadSessionAndData();
   }
 
-  @override
-  void didUpdateWidget(covariant ReportsBarChart oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.category != widget.category) {
-      _loadStoredData(); // reload chart if dropdown changes
-    }
-  }
-
-  List<String> getThisWeekLabels() {
-    final today = DateTime.now();
-    // Monday as start of week
-    final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-    return List.generate(7, (i) {
-      final date = startOfWeek.add(Duration(days: i));
-      return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i];
+  Future<void> _loadSessionAndData() async {
+    final sessionBox = await Hive.openBox('session');
+    _userID = sessionBox.get('userID');
+    await _loadStoredData();
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
     });
-  }
-
-  List<String> getThisMonthWeekLabels() {
-    final today = DateTime.now();
-    final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
-
-    // Define 4 or 5 intervals
-    final intervals = <String>[];
-    int start = 1;
-    while (start <= daysInMonth) {
-      int end = (start + 6 > daysInMonth) ? daysInMonth : start + 6;
-      intervals.add("$start-$end");
-      start = end + 1;
-    }
-    return intervals;
-  }
-
-  List<int> aggregateMonthlyData(Map<String, dynamic> jsonData) {
-    final today = DateTime.now();
-    final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
-
-    final intervals = getThisMonthWeekLabels();
-    final aggregatedValues = <int>[];
-
-    for (var interval in intervals) {
-      final parts = interval.split('-');
-      int start = int.parse(parts[0]);
-      int end = int.parse(parts[1]);
-
-      int sum = 0;
-      for (int day = start; day <= end; day++) {
-        final key =
-            "${day.toString().padLeft(2, '0')}/${today.month.toString().padLeft(2, '0')}";
-        sum += jsonData[key] as int? ?? 0;
-      }
-      aggregatedValues.add(sum);
-    }
-
-    return aggregatedValues;
   }
 
   Future<void> _loadStoredData() async {
     final endpoint = categoryEndpoint[widget.category];
-    if (endpoint == null) {
-      print("Category '${widget.category}' not found");
-      return;
-    }
+    if (endpoint == null) return;
 
     final url = Uri.parse(
-      '$baseUrl/$endpoint?username=${widget.username}&category=${widget.category}',
+      '$baseUrl/$endpoint?userID=$_userID&category=${widget.category}',
     );
 
     try {
@@ -144,29 +85,28 @@ class _ReportsBarChartState extends State<ReportsBarChart>
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
 
-        List<String> labels;
-        List<int> values;
+        List<String> labels = [];
+        List<int> values = [];
 
         if (widget.category == "This Week") {
-          // Flutter labels must match Flask keys exactly
           labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
           values = labels.map((label) => jsonData[label] as int? ?? 0).toList();
         } else {
-          // Monthly: aggregate weekly sums safely
           final today = DateTime.now();
           final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
-          labels = [];
 
-          int start = 1;
+          labels = [];
           final aggregatedValues = <int>[];
+          int start = 1;
           while (start <= daysInMonth) {
             int end = (start + 6 > daysInMonth) ? daysInMonth : start + 6;
             labels.add("$start-$end");
+
             int sum = 0;
             for (int day = start; day <= end; day++) {
               final key =
                   "${day.toString().padLeft(2, '0')}/${today.month.toString().padLeft(2, '0')}";
-              sum += jsonData[key] as int? ?? 0; // safe fallback
+              sum += jsonData[key] as int? ?? 0;
             }
             aggregatedValues.add(sum);
             start = end + 1;
@@ -178,16 +118,38 @@ class _ReportsBarChartState extends State<ReportsBarChart>
         setState(() {
           _labels = labels;
           _values = values;
-          _isLoading = false;
         });
 
         _animationController.forward(from: 0);
       } else {
-        print('Failed to load data: ${response.statusCode}');
+        _setEmptyData();
       }
     } catch (e) {
-      print('Error loading data: $e');
+      _setEmptyData();
     }
+  }
+
+  void _setEmptyData() {
+    if (!mounted) return;
+    setState(() {
+      _labels = widget.category == "This Week"
+          ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+          : _generateMonthWeekLabels();
+      _values = List.filled(_labels.length, 0);
+    });
+  }
+
+  List<String> _generateMonthWeekLabels() {
+    final today = DateTime.now();
+    final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
+    final intervals = <String>[];
+    int start = 1;
+    while (start <= daysInMonth) {
+      int end = (start + 6 > daysInMonth) ? daysInMonth : start + 6;
+      intervals.add("$start-$end");
+      start = end + 1;
+    }
+    return intervals;
   }
 
   @override
@@ -198,16 +160,17 @@ class _ReportsBarChartState extends State<ReportsBarChart>
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Colors.blue));
-    }
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+
     if (_values.isEmpty) {
-      return const Center(child: Text("No data available."));
+      _values = List.filled(_labels.length, 0);
     }
 
-    final maxY = (_values.reduce((a, b) => a > b ? a : b) + 1).toDouble();
+    final maxDataValue = _values.reduce((a, b) => a > b ? a : b);
+    final maxY = (maxDataValue > 0 ? maxDataValue * 1.2 : 1)
+        .toDouble(); // 20% padding
     final currentIndex = getCurrentIndex();
-    final maxValue = (_values.reduce((a, b) => a > b ? a : b) + 1).toDouble();
+
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.35,
       child: AnimatedBuilder(
@@ -217,14 +180,15 @@ class _ReportsBarChartState extends State<ReportsBarChart>
             BarChartData(
               maxY: maxY,
               gridData: FlGridData(show: false),
+              borderData: FlBorderData(show: false),
               titlesData: FlTitlesData(
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(showTitles: false),
                 ),
-                bottomTitles: AxisTitles(
+                rightTitles: AxisTitles(
                   sideTitles: SideTitles(showTitles: false),
                 ),
-                rightTitles: AxisTitles(
+                bottomTitles: AxisTitles(
                   sideTitles: SideTitles(showTitles: false),
                 ),
                 topTitles: AxisTitles(
@@ -245,41 +209,22 @@ class _ReportsBarChartState extends State<ReportsBarChart>
                   ),
                 ),
               ),
-              borderData: FlBorderData(show: false),
-              barTouchData: BarTouchData(
-                enabled: true,
-                touchTooltipData: BarTouchTooltipData(
-                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                    // hide tooltip if the bar is gray (no data)
-                    if (_values[groupIndex] == 0) return null;
-                    return BarTooltipItem(
-                      '${_values[groupIndex]}',
-                      const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    );
-                  },
-                ),
-              ),
               barGroups: List.generate(_values.length, (i) {
-                double barHeight;
+                double targetHeight = _values[i].toDouble();
+                double barHeight = targetHeight == 0
+                    ? maxY
+                    : targetHeight * _animation.value;
+
                 Color barStartColor;
                 Color barEndColor;
 
                 if (_values[i] == 0) {
-                  // No data: full height, grey
-                  barHeight = maxValue;
                   barStartColor = Colors.grey.shade300;
                   barEndColor = Colors.grey.shade300;
                 } else if (i == currentIndex) {
-                  // Current day/interval
-                  barHeight = _values[i] * _animation.value;
                   barStartColor = Colors.orange;
                   barEndColor = Colors.deepOrange;
                 } else {
-                  // Past days/intervals with data
-                  barHeight = _values[i] * _animation.value;
                   barStartColor = Colors.lightBlue;
                   barEndColor = Colors.blue;
                 }
@@ -301,6 +246,21 @@ class _ReportsBarChartState extends State<ReportsBarChart>
                   ],
                 );
               }),
+              // Add barTouchData here, outside the loop
+              barTouchData: BarTouchData(
+                enabled: true,
+                touchTooltipData: BarTouchTooltipData(
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                    // Disable tooltip for grey bars
+                    if (_values[groupIndex] == 0) return null;
+
+                    return BarTooltipItem(
+                      '${_values[groupIndex]}',
+                      const TextStyle(color: Colors.white),
+                    );
+                  },
+                ),
+              ),
             ),
           );
         },

@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       title: 'ADAMS Demo',
       home: initialUser == null
           ? const LoginPage()
-          : HomePage(username: initialUser),
+          : HomePage(username: initialUser!),
       theme: ThemeData(
         fontFamily: 'AlanSans',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),

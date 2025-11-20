@@ -1,31 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:idas_app/widgets/reports_bar_chart.dart';
 import 'package:idas_app/widgets/summary.dart';
 
 class ReportsPage extends StatefulWidget {
-  final String? username;
-  const ReportsPage({super.key, this.username});
+  const ReportsPage({super.key}); // no userID needed
 
   @override
   State<ReportsPage> createState() => _ReportsPageState();
 }
 
 class _ReportsPageState extends State<ReportsPage> {
+  String? userID;
+  bool _isLoading = true;
+
   String _selectedCategory = "This Week";
   final List<String> _categories = ["This Week", "This Month"];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadSession();
+  }
+
+  // ------ load current user info ------ //
+  Future<void> _loadSession() async {
+    final sessionBox = await Hive.openBox('session');
+    setState(() {
+      userID = sessionBox.get('userID');
+      _isLoading = false;
+    });
+  }
+  // ------------------------------------ //
+
+  // ------ get current month name ------ //
   String getCurrentMonthName() {
     final now = DateTime.now();
-    // List of month names
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
     return monthNames[now.month - 1];
   }
+  // ------------------------------------ //
 
+  // ------- design ------ //
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -46,7 +71,7 @@ class _ReportsPageState extends State<ReportsPage> {
             onChanged: (value) {
               if (value != null) {
                 setState(() {
-                  _selectedCategory = value; // change chart category
+                  _selectedCategory = value;
                 });
               }
             },
@@ -68,12 +93,12 @@ class _ReportsPageState extends State<ReportsPage> {
         const SizedBox(height: 16),
 
         // Chart
-        ReportsBarChart(category: _selectedCategory, username: widget.username),
+        ReportsBarChart(category: _selectedCategory),
 
         const SizedBox(height: 16),
 
         // Summary text
-        AlertSummary(username: widget.username, isWeekly: _selectedCategory == "This Week"),
+        AlertSummary(isWeekly: _selectedCategory == "This Week"),
       ],
     );
   }

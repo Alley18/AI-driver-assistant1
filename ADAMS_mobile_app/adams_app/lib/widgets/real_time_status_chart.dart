@@ -1,28 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:hive/hive.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'config.dart';
 import 'dart:async';
 
-// ---------------- updated 28/10 --------------- //
-Future<Map<String, double>> loadReportData(String? username) async {
-  final url = Uri.parse('$baseUrl/real-time-status?username=$username');
-  final response = await http.get(url);
-
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> rawData = json.decode(response.body);
-    return rawData.map(
-      (key, value) => MapEntry(key, (value as num).toDouble()),
-    );
-  } else {
-    throw Exception('Failed to load data');
-  }
-}
-
 class RealTimeStatusReport extends StatefulWidget {
-  final String? username;
-  const RealTimeStatusReport({Key? key, required this.username}) : super(key: key);
+  const RealTimeStatusReport({Key? key}) : super(key: key);
 
   @override
   State<RealTimeStatusReport> createState() => _RealTimeStatusReportState();
@@ -37,17 +22,55 @@ class _RealTimeStatusReportState extends State<RealTimeStatusReport> {
     const Color(0xffBBFBFF),
   ];
   Timer? _timer;
+  String? _userID;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
 
-    // refresh every few seconds
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
       _loadData();
     });
   }
+
+  // ------ get user-specific info and convert to pie chart values ------ //
+  Future<Map<String, double>> loadReportData(String? userID) async {
+    if (userID == null) return {};
+    final url = Uri.parse('$baseUrl/real-time-status?userID=$userID');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> rawData = json.decode(response.body);
+      return rawData.map(
+        (key, value) => MapEntry(key, (value as num).toDouble()),
+      );
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  Future<void> _loadData() async {
+    try {
+      final sessionBox = await Hive.openBox('session');
+      _userID = sessionBox.get('userID');
+
+      final newData = await loadReportData(_userID);
+
+      if (!mounted) return;
+      setState(() {
+        dataMap = newData;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Error loading chart data: $e");
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  // -------------------------------------------------------------------- //
 
   @override
   void dispose() {
@@ -55,20 +78,11 @@ class _RealTimeStatusReportState extends State<RealTimeStatusReport> {
     super.dispose();
   }
 
-  Future<void> _loadData() async {
-    try {
-      final newData = await loadReportData(widget.username!);
-      if (!mounted) return;
-      setState(() {
-        dataMap = newData;
-      });
-    } catch (e) {
-      debugPrint("Error loading chart data: $e");
-    }
-  }
-
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
+
     final bool hasData = dataMap != null && dataMap!.isNotEmpty;
 
     return Center(
@@ -79,13 +93,9 @@ class _RealTimeStatusReportState extends State<RealTimeStatusReport> {
           dataMap: hasData ? dataMap! : {"": 1.0},
           animationDuration: const Duration(milliseconds: 800),
           chartLegendSpacing: 32,
-          chartRadius: 150, // keep fixed
-          colorList: hasData
-              ? colorList
-              : [
-                  Colors.transparent, // keeps ring visible but neutral
-                ],
-          baseChartColor: Colors.grey.shade300, // gray background ring
+          chartRadius: 150,
+          colorList: hasData ? colorList : [Colors.transparent],
+          baseChartColor: Colors.grey.shade300,
           chartType: ChartType.ring,
           ringStrokeWidth: 32,
           legendOptions: LegendOptions(

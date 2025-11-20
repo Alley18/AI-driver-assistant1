@@ -6,8 +6,9 @@ import 'package:idas_app/pages/weekly_activity_page.dart';
 import 'package:idas_app/widgets/bottom_nav.dart';
 
 class HomePage extends StatefulWidget {
-  final String? username;
-  const HomePage({super.key, this.username});
+  final String username;
+  final String? userID;
+  const HomePage({super.key, required this.username, this.userID});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -20,12 +21,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // now include username in every page
     _pages = [
-      RealTimeStatus(username: widget.username),
-      ReportsPage(username: widget.username),
-      DailyReportAndEvent(username: widget.username),
-      SettingsPage(username: widget.username),
+      RealTimeStatus(),
+      ReportsPage(),
+      WeeklyActivityPage(),
+      SettingsPage()
     ];
   }
 
@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
         onTap: _onNavTapped,
       ),
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.blue.shade300,
         centerTitle: true,
         title: Text(
           "ADAMS",

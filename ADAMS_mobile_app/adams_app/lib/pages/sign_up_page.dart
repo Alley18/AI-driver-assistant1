@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:idas_app/pages/login_page.dart';
-import 'package:idas_app/pages/home_page.dart'; // ✅ Add this import
+import 'package:idas_app/pages/home_page.dart';
+import '../widgets/config.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -14,78 +17,76 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  late Box _userBox;
-  bool _boxReady = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _initBox();
+  // ------ save current user info from text field ------ //
+  Future<void> saveSession(String username, String userID) async {
+    final sessionBox = await Hive.openBox('session');
+    await sessionBox.put('currentUser', username);
+    await sessionBox.put('userID', userID);
   }
+  // ---------------------------------------------------- //
 
-  Future<void> _initBox() async {
-    _userBox = await Hive.openBox('users');
-    setState(() => _boxReady = true);
-  }
-
+  // ------ sign up function - send user info to db ------ //
   void _signup() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+    if (!_formKey.currentState!.validate()) return;
 
-      final email = _emailController.text.trim();
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
+    setState(() => _isLoading = true);
 
-      // Check for duplicates
-      var duplicateUser = _userBox.values.firstWhere(
-        (user) => user['email'] == email || user['username'] == username,
-        orElse: () => null,
+    final email = _emailController.text.trim();
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    try {
+      final url = Uri.parse('$baseUrl/signup-route');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'username': username, 'password': password}),
       );
 
-      if (duplicateUser != null) {
-        setState(() => _isLoading = false);
-        String message = duplicateUser['email'] == email
-            ? "Email already exists"
-            : "Username already exists";
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final userID = data['user_id'];
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        await saveSession(username, userID);
+
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => HomePage(username: username, userID: userID)),
         );
-        return;
+      } else if (response.statusCode == 409) {
+        final data = jsonDecode(response.body);
+        _showSnackBar(data['message'] ?? "User already exists.");
+      } else {
+        _showSnackBar("Signup failed: ${response.statusCode}");
       }
-
-      // Save new user
-      await _userBox.add({
-        "email": email,
-        "username": username,
-        "password": password,
-      });
-
-      // Save session
-      final sessionBox = await Hive.openBox('session');
-      await sessionBox.put('currentUser', username);
-
+    } catch (e) {
+      debugPrint("Error contacting backend: $e");
+      _showSnackBar("Network error. Try again later.");
+    } finally {
       setState(() => _isLoading = false);
-
-      // ✅ Go directly to user's HomePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage(username: username)),
-      );
     }
   }
+  // ----------------------------------------------------- //
 
+  // ------ function for back button - go to login page ------ //
   void _goToLogin() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()));
+  }
+  // --------------------------------------------------------- //
+
+  // ------ helper function to show error in snackbar ------ //
+  void _showSnackBar(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: Colors.red),
     );
   }
+  // ------------------------------------------------------- //
 
   @override
   void dispose() {
@@ -96,6 +97,7 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
@@ -106,12 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: EdgeInsets.only(
-                left: 16,
-                right: 16,
-                top: 32,
-                bottom: bottomPadding + 32,
-              ),
+              padding: EdgeInsets.only(left: 16, right: 16, top: 32, bottom: bottomPadding + 32),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: IntrinsicHeight(
@@ -123,10 +120,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       children: [
                         const Text(
                           "Sign Up for ADAMS",
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 4),
@@ -137,118 +131,77 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Email
                         TextFormField(
                           controller: _emailController,
                           decoration: InputDecoration(
                             labelText: "Email",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                           ),
-                          validator: (value) =>
-                              value!.isEmpty ? "Please enter email" : null,
+                          validator: (value) => value!.isEmpty ? "Please enter email" : null,
                         ),
                         const SizedBox(height: 12),
 
-                        // Username
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             labelText: "Username",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                           ),
-                          validator: (value) =>
-                              value!.isEmpty ? "Please enter username" : null,
+                          validator: (value) => value!.isEmpty ? "Please enter username" : null,
                         ),
                         const SizedBox(height: 12),
 
-                        // Password
                         TextFormField(
                           controller: _passwordController,
                           decoration: InputDecoration(
                             labelText: "Password",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                           ),
                           obscureText: true,
-                          validator: (value) =>
-                              value!.isEmpty ? "Please enter password" : null,
+                          validator: (value) => value!.isEmpty ? "Please enter password" : null,
                         ),
                         const SizedBox(height: 12),
 
-                        // Confirm Password
                         TextFormField(
                           controller: _confirmPasswordController,
                           decoration: InputDecoration(
                             labelText: "Confirm Password",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 16,
-                            ),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                           ),
                           obscureText: true,
                           validator: (value) {
-                            if (value == null || value.isEmpty)
-                              return "Please confirm password";
-                            if (value != _passwordController.text)
-                              return "Password does not match";
+                            if (value == null || value.isEmpty) return "Please confirm password";
+                            if (value != _passwordController.text) return "Password does not match";
                             return null;
                           },
                         ),
                         const SizedBox(height: 24),
 
-                        // Sign Up button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed:
-                                (_boxReady && !_isLoading) ? _signup : null,
+                            onPressed: _isLoading ? null : _signup,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.lightBlue,
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 4,
                             ),
                             child: _isLoading
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.black,
-                                    ),
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
                                   )
-                                : const Text(
-                                    "Sign Up",
-                                    style: TextStyle(
-                                        fontSize: 18, color: Colors.black),
-                                  ),
+                                : const Text("Sign Up", style: TextStyle(fontSize: 18, color: Colors.black)),
                           ),
                         ),
                         const SizedBox(height: 8),
 
-                        // Back button
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -256,18 +209,10 @@ class _SignUpPageState extends State<SignUpPage> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey.shade300,
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 2,
                             ),
-                            child: Text(
-                              "Back",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey.shade700,
-                              ),
-                            ),
+                            child: Text("Back", style: TextStyle(fontSize: 18, color: Colors.grey.shade700)),
                           ),
                         ),
                       ],

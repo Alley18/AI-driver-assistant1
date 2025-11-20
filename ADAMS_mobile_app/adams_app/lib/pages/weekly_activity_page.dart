@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:idas_app/widgets/event_log_list.dart';
 import 'package:idas_app/widgets/weekly_activity.dart';
 
-class DailyReportAndEvent extends StatefulWidget {
-  final String? username;
-  const DailyReportAndEvent({super.key, this.username});
+class WeeklyActivityPage extends StatefulWidget {
+  const WeeklyActivityPage({super.key}); // no userID needed
 
   @override
-  State<DailyReportAndEvent> createState() => _DailyReportAndEventState();
+  State<WeeklyActivityPage> createState() => _WeeklyActivityPageState();
 }
 
-class _DailyReportAndEventState extends State<DailyReportAndEvent> {
+class _WeeklyActivityPageState extends State<WeeklyActivityPage> {
   late PageController _pageController;
   late int _currentPage;
+  String? _userID;
+  bool _isLoading = true;
 
+  // ------ labels for graph ------ //
   final List<String> _dayLabels = [
     "Monday",
     "Tuesday",
@@ -23,13 +26,25 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
     "Saturday",
     "Sunday",
   ];
+  // ------------------------------ //
 
   @override
   void initState() {
     super.initState();
-    _currentPage = DateTime.now().weekday - 1; // get current day
+    _currentPage = DateTime.now().weekday - 1;
     _pageController = PageController(initialPage: _currentPage);
+    _loadSession();
   }
+
+  // ------ load current user info ------ //
+  Future<void> _loadSession() async {
+    final sessionBox = await Hive.openBox('session');
+    setState(() {
+      _userID = sessionBox.get('userID');
+      _isLoading = false;
+    });
+  }
+  // ------------------------------------ //
 
   @override
   void dispose() {
@@ -37,8 +52,15 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
     super.dispose();
   }
 
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -53,7 +75,7 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
           Text(_dayLabels[_currentPage], style: const TextStyle(fontSize: 22)),
           const SizedBox(height: 8),
 
-          // dots indicator
+          // ------ dots indicator ------ //
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(_dayLabels.length, (index) {
@@ -63,26 +85,26 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
                 width: _currentPage == index ? 12 : 8,
                 height: _currentPage == index ? 12 : 8,
                 decoration: BoxDecoration(
-                  color: _currentPage == index ? Colors.lightBlue : Colors.grey,
+                  color: _currentPage == index ? Colors.blue.shade300 : Colors.grey,
                   shape: BoxShape.circle,
                 ),
               );
             }),
           ),
+          // ---------------------------- //
 
-          // pie chart + event log list container
           const SizedBox(height: 30),
+
           Expanded(
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: (index) {
                 setState(() {
-                  _currentPage = index; // update day label and dot
+                  _currentPage = index;
                 });
               },
               itemCount: _dayLabels.length,
               itemBuilder: (context, index) {
-                // actual graph here
                 final day = _dayLabels[index];
                 return Column(
                   children: [
@@ -90,10 +112,13 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
                       flex: 2,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 16, bottom: 16),
-                        child: DailyReport(day: day, username: widget.username),
-                      ), // pie chart
+                        child: WeeklyActivity(
+                          day: day,
+                          userID: _userID,
+                        ),
+                      ),
                     ),
-                    Text(
+                    const Text(
                       "Event Logs",
                       style: TextStyle(
                         fontSize: 20,
@@ -103,8 +128,8 @@ class _DailyReportAndEventState extends State<DailyReportAndEvent> {
                     const SizedBox(height: 8),
                     Expanded(
                       flex: 1,
-                      child: EventLogList(day: day, username: widget.username),
-                    ), // event log list
+                      child: EventLogList(day: day),
+                    ),
                   ],
                 );
               },
