@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:idas_app/pages/home_page.dart';
 import '../widgets/config.dart';
 
 class DeviceLinkPage extends StatefulWidget {
@@ -50,10 +51,31 @@ class _DeviceLinkPageState extends State<DeviceLinkPage> {
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final sessionBox = await Hive.openBox('session');
+        await sessionBox.put('hardwareID', hardwareID);
+
+        if (!mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => HomePage(username: username!, userID: userID),
+          ),
+        );
+      
+       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Connected to $hardwareID!"),
+            content: Text("Connected to $hardwareID."),
             backgroundColor: Colors.green,
+          ),
+        );
+        
+      }
+
+      if (response.statusCode == 403) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Hardware not registered."),
+            backgroundColor: Colors.red,
           ),
         );
       }

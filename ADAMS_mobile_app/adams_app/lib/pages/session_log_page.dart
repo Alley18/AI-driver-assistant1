@@ -117,6 +117,7 @@ class _SessionLogPageState extends State<SessionLogPage> {
             constraints: const BoxConstraints(maxWidth: double.infinity),
             child: Column(
               children: [
+                
                 const SizedBox(height: 16),
                 Text(
                   "Session Logs",
@@ -142,7 +143,6 @@ class _SessionLogPageState extends State<SessionLogPage> {
                 if (sessions.isNotEmpty)
                   Column(
                     children: sessions.map((session) {
-                      final title = session['title'];
                       final date = session['date'];
                       final start = session['start'];
                       final end = session['end'];
@@ -166,7 +166,7 @@ class _SessionLogPageState extends State<SessionLogPage> {
                             iconColor: Colors.black,
                             collapsedIconColor: Colors.black,
                             title: Text(
-                              "$title [ $date $start - $end ]",
+                              "$date [$start - $end]",
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,

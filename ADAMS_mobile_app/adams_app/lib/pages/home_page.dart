@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.blue.shade300,
         centerTitle: true,
+        automaticallyImplyLeading: false,
         title: Text(
           "ADAMS",
           style: const TextStyle(fontSize: 30, color: Colors.white),

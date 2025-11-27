@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:idas_app/pages/device_link_page.dart';
 import 'package:idas_app/pages/login_page.dart';
 import 'package:idas_app/pages/session_log_page.dart';
+import 'package:idas_app/widgets/config.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key}); // no username needed
@@ -13,6 +17,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String? _username;
+  String? _hardwareID;
   bool _isLoading = true;
 
   @override
@@ -26,6 +31,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final sessionBox = await Hive.openBox('session');
     setState(() {
       _username = sessionBox.get('currentUser');
+      _hardwareID = sessionBox.get('hardwareID');
       _isLoading = false;
     });
   }
@@ -43,13 +49,40 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   // -------------------------------------------------------------- //
 
+  // ------ turn hardware on  ------ //
+  Future<void> _on() async {
+    debugPrint(_hardwareID);
+    if (_hardwareID == null || _hardwareID.toString().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "No hardware connected. Please link your device first.",
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    try {
+      final url = Uri.parse('$baseUrl/on-route');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'device_id': _hardwareID, 'status': 'on'}),
+      );
+
+      debugPrint("Sent!");
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+  }
+  // -------------------------------------- //
+
   // ------ design ------ //
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -60,6 +93,30 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Column(
               children: [
+                const Text(
+                  "Settings",
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 200,
+                  height: 40,
+                  child: ElevatedButton(
+                    onPressed: _on,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.lightBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadiusGeometry.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Turn On Hardware",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.add_circle_outline, size: 25),
                   title: const Text(
@@ -70,7 +127,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const DeviceLinkPage()),
-                    );
+                    ).then((_) => _loadSession());
                   },
                 ),
                 ListTile(
@@ -79,7 +136,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     "Session Logs",
                     style: TextStyle(fontSize: 24),
                   ),
-                   onTap: () {
+                  onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const SessionLogPage()),
