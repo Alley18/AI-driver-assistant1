@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'config.dart';
 import 'dart:async';
 
+// ------ get weekly activity data from backend ------ //
 Future<Map<String, Map<String, double>>> fetchWeeklyActivityData(String userID) async {
   final url = Uri.parse('$baseUrl/weekly-activity?userID=$userID');
   final response = await http.get(url);
@@ -24,6 +25,7 @@ Future<Map<String, Map<String, double>>> fetchWeeklyActivityData(String userID) 
     throw Exception('Failed to load weekly activity data');
   }
 }
+// --------------------------------------------------- //
 
 class WeeklyActivity extends StatefulWidget {
   final String day;
@@ -61,6 +63,7 @@ class _WeeklyActivityState extends State<WeeklyActivity> {
     super.dispose();
   }
 
+  // ------ load data for specific day ------ //
   Future<void> _loadDataForDay(String day) async {
     try {
       final sessionBox = await Hive.openBox('session');
@@ -80,7 +83,9 @@ class _WeeklyActivityState extends State<WeeklyActivity> {
       debugPrint("Error fetching weekly activity: $e");
     }
   }
+  // ---------------------------------------- //
 
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
     final bool hasData = dataMap != null && dataMap!.isNotEmpty;

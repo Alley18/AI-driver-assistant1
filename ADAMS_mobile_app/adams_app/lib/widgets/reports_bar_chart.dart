@@ -62,6 +62,7 @@ class _ReportsBarChartState extends State<ReportsBarChart>
     _loadSessionAndData();
   }
 
+  // ------ load current user info ------ //
   Future<void> _loadSessionAndData() async {
     final sessionBox = await Hive.openBox('session');
     _userID = sessionBox.get('userID');
@@ -71,7 +72,9 @@ class _ReportsBarChartState extends State<ReportsBarChart>
       _isLoading = false;
     });
   }
+  // ------------------------------------ //
 
+  // ------ load data from backend to insert into graphs ------ //
   Future<void> _loadStoredData() async {
     final endpoint = categoryEndpoint[widget.category];
     if (endpoint == null) return;
@@ -128,7 +131,9 @@ class _ReportsBarChartState extends State<ReportsBarChart>
       _setEmptyData();
     }
   }
+  // ---------------------------------------------------------- //
 
+  // ------ create empty graph when no data ------ //
   void _setEmptyData() {
     if (!mounted) return;
     setState(() {
@@ -138,7 +143,9 @@ class _ReportsBarChartState extends State<ReportsBarChart>
       _values = List.filled(_labels.length, 0);
     });
   }
+  // --------------------------------------------- //
 
+  // ------ creat labels for month (week intervals) ------ //
   List<String> _generateMonthWeekLabels() {
     final today = DateTime.now();
     final daysInMonth = DateTime(today.year, today.month + 1, 0).day;
@@ -151,6 +158,7 @@ class _ReportsBarChartState extends State<ReportsBarChart>
     }
     return intervals;
   }
+  // ----------------------------------------------------- //
 
   @override
   void dispose() {
@@ -158,6 +166,7 @@ class _ReportsBarChartState extends State<ReportsBarChart>
     super.dispose();
   }
 
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());

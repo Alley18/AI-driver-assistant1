@@ -29,11 +29,13 @@ class _AlertSummaryState extends State<AlertSummary> {
     });
   }
 
+  // ------ load current user info ------ //
   Future<void> _loadSessionAndData() async {
     final sessionBox = await Hive.openBox('session');
     _userID = sessionBox.get('userID');
     await _updateTotal();
   }
+  // ------------------------------------ //
 
   @override
   void dispose() {
@@ -41,6 +43,7 @@ class _AlertSummaryState extends State<AlertSummary> {
     super.dispose();
   }
 
+  // ------ update total alerts for summary ------ //
   Future<void> _updateTotal() async {
     if (_userID == null) return;
 
@@ -63,7 +66,9 @@ class _AlertSummaryState extends State<AlertSummary> {
       debugPrint("Error updating total alerts: $e");
     }
   }
+  // --------------------------------------------- //
 
+  // ------ design ------//
   @override
   Widget build(BuildContext context) {
     final period = widget.isWeekly ? "week" : "month";
