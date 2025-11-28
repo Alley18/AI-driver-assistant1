@@ -1,42 +1,58 @@
 from app.db.arango_db import db
 from app.services.time_services import return_today, return_from_monday
+from app.services.auth_services import get_deviceid
+
+#----------------------------------------------------------#
+#-------------------frontend ingest------------------------#
+#----------------------------------------------------------#
+
+#----------------------------------------------------------#
+#------------------frontend display------------------------#
+#----------------------------------------------------------#
 
 #-----------------------------------------------
 #home
 #-----------------------------------------------
-
+#change al to support user id
 #/current-events-list 
-def get_today_log():
+def get_today_log(user_id):
+    device_id = get_deviceid(user_id)
     today = return_today().strftime('%Y-%m-%d')
 
     query = """
     FOR e IN event
+        FILTER e.device_id == @device_id
         LET eventDate = SUBSTRING(e.timestamp, 0, 10)
         FILTER eventDate == @today
+        FILTER e.type NOT IN ["ON", "OFF", "Eyes reopened", "Recovered from drowsiness", "Recovered from distraction"]
         SORT e.timestamp ASC
         RETURN {
             "time": SUBSTRING(e.timestamp, 11, 5),
             "type": e.type
         }
     """
-    
-    cursor = db.aql.execute(query, bind_vars={'today': today})
+
+    cursor = db.aql.execute(query, bind_vars={'today': today, 'device_id': device_id})
     result = list(cursor)
     return result
 
+
 #/real-time-status
-def get_event_count():
+def get_event_count(user_id):
+    device_id = get_deviceid(user_id)
     today = return_today().strftime('%Y-%m-%d')
 
     query = """
     FOR e IN event
+        FILTER e.device_id == @device_id
         LET eventDate = SUBSTRING(e.timestamp, 0, 10)
         FILTER eventDate == @today
+        FILTER e.type NOT IN ["ON", "OFF", "Eyes reopened", "Recovered from drowsiness", "Recovered from distraction"]
         COLLECT type = e.type WITH COUNT INTO freq
         RETURN { type: type, freq: freq }
     """
 
-    cursor = db.aql.execute(query, bind_vars={'today': today})
+    cursor = db.aql.execute(query, bind_vars={'today': today, 'device_id':device_id})
 
     result = {}
     for item in cursor:
@@ -45,15 +61,21 @@ def get_event_count():
 
     return result
 
-#/current-driver-status
-def get_driver_state():
+#/current-driver-status (state: normal, drowsy, distracted)
+def get_driver_state(user_id):
+    device_id = get_deviceid(user_id)
+    today = return_today().strftime('%Y-%m-%d')
+
     query = """
     FOR s IN state
+        FILTER s.device_id == @device_id
+        LET eventDate = SUBSTRING(s.timestamp, 0, 10)
+        FILTER eventDate == @today
         SORT s.timestamp DESC
         LIMIT 1
         RETURN s.driver_state
     """
-    cursor = db.aql.execute(query)
+    cursor = db.aql.execute(query, bind_vars={'today': today,'device_id': device_id})
     state = next(cursor, None)
     return {"driver_state": state}
 
@@ -63,7 +85,9 @@ def get_driver_state():
 #-----------------------------------------------
 
 #/thisweek
-def get_weekly_report():
+def get_weekly_report(user_id):
+    device_id = get_deviceid(user_id)
+
     day_map = {
         "Monday": "Mon",
         "Tuesday": "Tue",
@@ -80,11 +104,13 @@ def get_weekly_report():
 
     query = """
     FOR e IN event
+        FILTER e.device_id == @device_id
         FILTER e.day IN @valid_days
+        FILTER e.type NOT IN ["ON", "OFF", "Eyes reopened", "Recovered from drowsiness", "Recovered from distraction"]
         COLLECT day = e.day WITH COUNT INTO freq
         RETURN { day, freq }
     """
-    cursor = db.aql.execute(query, bind_vars={'valid_days': valid_days})
+    cursor = db.aql.execute(query, bind_vars={'valid_days': valid_days, 'device_id':device_id})
 
     result = {}
     for item in cursor:
@@ -94,7 +120,8 @@ def get_weekly_report():
     return result
 
 #/thismonth
-def get_monthly_report():
+def get_monthly_report(user_id):
+    device_id = get_deviceid(user_id)
     today = return_today()
     month_start = today.replace(day=1)
 
@@ -103,12 +130,14 @@ def get_monthly_report():
 
     query = """
     FOR e IN event
+        FILTER e.device_id == @device_id
         FILTER e.date >= @month_start AND e.date <= @today
         LET dateStr = CONCAT(SUBSTRING(e.date, 8, 2), "/", SUBSTRING(e.date, 5, 2))
+        FILTER e.type NOT IN ["ON", "OFF", "Eyes reopened", "Recovered from drowsiness", "Recovered from distraction"]
         COLLECT date_str = dateStr WITH COUNT INTO freq
         RETURN { date_str, freq }
     """
-    cursor = db.aql.execute(query, bind_vars={'month_start': month_start_str, 'today': today_str})
+    cursor = db.aql.execute(query, bind_vars={'month_start': month_start_str, 'today': today_str, 'device_id':device_id})
 
     result = {}
     for item in cursor:
@@ -121,7 +150,8 @@ def get_monthly_report():
 #-----------------------------------------------
 
 #/event-log-list
-def get_weekly_log():
+def get_weekly_log(user_id):
+    device_id = get_deviceid(user_id)
     today = return_today()
     last_monday = return_from_monday()
     today_str = today.strftime('%Y-%m-%d')
@@ -129,11 +159,13 @@ def get_weekly_log():
 
     query = """
     FOR e IN event
+        FILTER e.device_id == @device_id
         FILTER e.date >= @monday AND e.date <= @today
         FILTER e.type != null
+        FILTER e.type NOT IN ["ON", "OFF", "Eyes reopened", "Recovered from drowsiness", "Recovered from distraction"]
         RETURN {day: e.day, time: e.time, type: e.type}
     """
-    cursor = db.aql.execute(query, bind_vars={'monday': monday_str, 'today': today_str})
+    cursor = db.aql.execute(query, bind_vars={'monday': monday_str, 'today': today_str, 'device_id':device_id})
     events = list(cursor)
 
     # Group events by day
@@ -165,7 +197,8 @@ def get_weekly_log():
     return result
 
 #/weekly-activity
-def get_weekly_event():
+def get_weekly_event(user_id):
+    device_id = get_deviceid(user_id)
     today = return_today()
     last_monday = return_from_monday()
     today_str = today.strftime('%Y-%m-%d')
@@ -173,13 +206,15 @@ def get_weekly_event():
 
     query = """
     FOR e IN event
+        FILTER e.device_id == @device_id
         FILTER e.date >= @monday AND e.date <= @today
         FILTER e.type != null
+        FILTER e.type NOT IN ["ON", "OFF", "Eyes reopened", "Recovered from drowsiness", "Recovered from distraction"]
         COLLECT day = e.day, type = e.type WITH COUNT INTO freq
         RETURN {day, type, freq}
     """
 
-    cursor = db.aql.execute(query, bind_vars={'monday': monday_str, 'today': today_str})
+    cursor = db.aql.execute(query, bind_vars={'monday': monday_str, 'today': today_str, 'device_id':device_id})
     raw_result = list(cursor)
 
     # Initialize all weekdays

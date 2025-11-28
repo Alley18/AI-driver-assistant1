@@ -4,9 +4,9 @@ from arango import ArangoClient
 client = ArangoClient()
 
 # setup
-DB_NAME = "iDASdb"
+DB_NAME = "ADAMSdb"
 USERNAME = "root"
-PASSWORD = "needhelp"
+PASSWORD = "123"
 
 # system connection
 sys_db = client.db("_system", username=USERNAME, password=PASSWORD)
@@ -19,6 +19,6 @@ if not sys_db.has_database(DB_NAME):
 db = client.db(DB_NAME, username=USERNAME, password=PASSWORD)
 
 # Create collections if missing
-for name in ["state", "event", "users"]:
+for name in ["state", "event", "sessions", "summary", "trend", "users", "users_devices", "authorized_device"]:
     if not db.has_collection(name):
         db.create_collection(name)

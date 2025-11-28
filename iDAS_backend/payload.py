@@ -8,17 +8,19 @@ STATE_URL = f"http://{SERVER_IP}:5000/api/kucing-state"
 def get_state_payload():
     return {
         "state": {
+            "device_id": "dev1",
             "timestamp": datetime.now().isoformat(),
-            "driver_state": "Mildly Fatigued"
+            "driver_state": "Normal"
         }
     }
 
 def get_event_payload():
     return {
         "event": {
+            "device_id": "dev1",
             "timestamp": datetime.now().isoformat(),
             "alert_level": 2,
-            "type": "Pitch deviation >3s",
+            "type": "Hands off steering",
             "ear": 0.404,
             "mar": 0.0,
             "perclos": 0.086,
