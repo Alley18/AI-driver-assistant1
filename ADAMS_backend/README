@@ -1,0 +1,28 @@
+Software/programming language used:
+- Python 3.13.7
+- ArangoDB 3.11.8
+- Arango Python driver : python-arango 8.2.2
+- dependencies imported in requirements.txt 
+
+## installing arangodb
+- arangodb.com/downloads/
+- community edition
+
+## arango python driver 
+- pip install python-arango --upgrade
+
+##api/routes.py
+- expose all endpoints for hardware and frontend
+- change hardware_ip accordingly
+
+##services
+- contain all functions ranging from storing, fetching, preprocess etc
+- 
+
+##.env 
+- perplexity_api_key need to be requested by yourself from perplexity
+- after requested, just copy paste to perplexity_api_key
+
+##ai/trend_analysis.py 
+- contain function for linear regression
+- purpose: finding trend 
