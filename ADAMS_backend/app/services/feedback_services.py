@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 from app.db.arango_db import db
 from .auth_services import get_deviceid
-from .llm_services import generate_driving_coach_feedback, parse_feedback_response
 from .storing_services import save_feedback
+from ..ai.llm_feedback import generate_driving_coach_feedback, parse_feedback_response
 
 def generate_feedback(device_id) -> Dict[str, Any]:
     summary = fetch_latest_summary(device_id)
@@ -21,7 +21,7 @@ def generate_feedback(device_id) -> Dict[str, Any]:
     
     try:
         feedback_text = generate_driving_coach_feedback(session_json, trend_json)
-        print(f"🥵Feedback text: {feedback_text}")
+        print(f"Feedback text: {feedback_text}")
         print(feedback_text["feedback"])  
         print(feedback_text["recommended_action"])
         parsed_feedback = parse_feedback_response(feedback_text)

@@ -34,7 +34,3 @@ def store_event(payload: dict):
             generate_feedback(device_id)
     
     return {"status": "processed"}
-
-#----------------------------------------------------------#
-#-------------------on off application---------------------#
-#----------------------------------------------------------#

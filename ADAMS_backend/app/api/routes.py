@@ -1,11 +1,11 @@
 import requests
 from flask import Blueprint, request, jsonify
-from app.services.auth_services import get_userid, is_userid_provided, auth_match, hash_password, is_authorized_device, get_deviceid
-from app.services.storing_services import save_user, save_device
-from app.services.hardware_services import store_state ,store_event
-from app.services.client_services import get_today_log, get_event_count, get_driver_state, get_weekly_report, get_monthly_report, get_weekly_event, get_weekly_log
-from app.services.sessions_services import get_sessions
-from app.services.feedback_services import fetch_feedback
+from ..services.auth_services import get_userid, is_userid_provided, auth_match, hash_password, is_authorized_device, get_deviceid
+from ..services.storing_services import save_user, save_device
+from ..services.hardware_services import store_state ,store_event
+from ..services.client_services import get_today_log, get_event_count, get_driver_state, get_weekly_report, get_monthly_report, get_weekly_event, get_weekly_log
+from ..services.sessions_services import get_sessions
+from ..services.feedback_services import fetch_feedback
 
 HARDWARE_IP = "172.19.23.147"
 api_bp = Blueprint("api", __name__)

@@ -1,5 +1,5 @@
 from flask import jsonify
-from app.db.arango_db import db
+from ..db.arango_db import db
 import bcrypt
 
 #-------------------------------------------------------

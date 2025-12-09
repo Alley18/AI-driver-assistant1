@@ -1,5 +1,5 @@
-from app.ai.trend_analysis import analyze_driver_trends
-from app.db.arango_db import db
+from ..ai.trend_analysis import analyze_driver_trends
+from ..db.arango_db import db
 from .storing_services import save_trend
 from datetime import datetime
 

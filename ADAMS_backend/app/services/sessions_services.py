@@ -1,4 +1,4 @@
-from app.db.arango_db import db
+from ..db.arango_db import db
 from .auth_services import get_deviceid
 from .storing_services import save_session
 

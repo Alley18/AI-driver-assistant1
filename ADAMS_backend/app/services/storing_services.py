@@ -1,4 +1,4 @@
-from app.db.arango_db import db
+from ..db.arango_db import db
 from .time_services import preprocess_timestamp
 from arango.exceptions import DocumentInsertError
 

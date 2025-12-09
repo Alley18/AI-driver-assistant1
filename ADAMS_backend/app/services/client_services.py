@@ -1,4 +1,4 @@
-from app.db.arango_db import db
+from ..db.arango_db import db
 from .time_services import return_today, return_from_monday
 from .auth_services import get_deviceid
 
