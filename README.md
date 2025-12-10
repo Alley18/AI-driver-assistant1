@@ -58,7 +58,7 @@ Mobile Dashboard
 - MediaPipe
 - Flutter
 - Flask
-- DjangoDB
+- ArangoDB
 - apa lagi
 
 ### System Architecture
