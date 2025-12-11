@@ -39,6 +39,7 @@ class WeeklyActivity extends StatefulWidget {
 class _WeeklyActivityState extends State<WeeklyActivity> {
   Map<String, double>? dataMap;
   final List<Color> colorList = [
+    const Color.fromARGB(255, 49, 1, 131),
     const Color(0xff5409DA),
     const Color(0xff4E71FF),
     const Color(0xff8DD8FF),
@@ -94,7 +95,7 @@ class _WeeklyActivityState extends State<WeeklyActivity> {
 
     return Center(
       child: SizedBox(
-        width: 350,
+        width: MediaQuery.of(context).size.width * 0.9,
         height: 350,
         child: PieChart(
           dataMap: chartData,

@@ -21,10 +21,11 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   // ------ hive to save current user info ------ //
-  Future<void> saveSession(String username, String userID) async {
+  Future<void> saveSession(String username, String userID, String hardwareID) async {
     final sessionBox = await Hive.openBox('session');
     await sessionBox.put('currentUser', username);
     await sessionBox.put('userID', userID);
+    await sessionBox.put('hardwareID', hardwareID);
   }
   // -------------------------------------------- //
 
@@ -58,14 +59,15 @@ class _LoginPageState extends State<LoginPage> {
         final data = jsonDecode(response.body);
         final userID = data['user_id'];
         final username = data['username'];
+        final hardwareID = data['device_id'];
 
-        await saveSession(username, userID);
+        await saveSession(username, userID, hardwareID);
 
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => HomePage(username: username, userID: userID),
+            builder: (_) => NavigationBarBottom(username: username, userID: userID),
           ),
         );
       } else if (response.statusCode == 404) {
@@ -101,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => HomePage(username: dummyUsername, userID: dummyUserID),
+        builder: (_) => NavigationBarBottom(username: dummyUsername, userID: dummyUserID),
       ),
     );
   }
@@ -157,6 +159,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 24),
 
               SizedBox(
+                height: 40,
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _login,
@@ -169,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                          height: 20,
+                          height: 40,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
@@ -178,7 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                         )
                       : const Text(
                           "Login",
-                          style: TextStyle(fontSize: 18, color: Colors.black),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                 ),
               ),
@@ -190,8 +193,8 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 8),
                     child: Text(
-                      "or sign up",
-                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                      "or",
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
                     ),
                   ),
                   Expanded(child: Divider(thickness: 1, color: Colors.grey)),
@@ -200,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 8),
 
               SizedBox(
-                width: 150,
+                width: double.infinity,
                 height: 40,
                 child: ElevatedButton(
                   onPressed: _signup,

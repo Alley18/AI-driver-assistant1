@@ -57,7 +57,7 @@ class _SignUpPageState extends State<SignUpPage> {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => HomePage(username: username, userID: userID)),
+          MaterialPageRoute(builder: (_) => NavigationBarBottom(username: username, userID: userID)),
         );
       } else if (response.statusCode == 409) {
         final data = jsonDecode(response.body);

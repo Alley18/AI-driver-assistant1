@@ -84,7 +84,7 @@ class _ReportsBarChartState extends State<ReportsBarChart>
     );
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(url).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
 

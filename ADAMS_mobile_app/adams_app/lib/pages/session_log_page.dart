@@ -23,39 +23,23 @@ class _SessionLogPageState extends State<SessionLogPage> {
     _loadSession();
   }
 
-  //   Future<void> _loadSession() async {
-  //   setState(() => _isLoading = true);
-
-  //   await Future.delayed(const Duration(seconds: 1)); // mimic loading delay
-
-  //   // ---- mock data ---- //
-  //   sessions = [
-  //     {
-  //       "title": "Session 1",
-  //       "date": "14-11-25",
-  //       "start": "11:22",
-  //       "end": "11:45",
+  // ------ generate mock data ------ //
+  // List<Map<String, dynamic>> generateMockSessions(int count) {
+  //   final List<Map<String, dynamic>> mock = [];
+  //   for (int i = 0; i < count; i++) {
+  //     mock.add({
+  //       "date": "${14 + i}-11-25",
+  //       "start": "10:${10 + i}",
+  //       "end": "10:${30 + i}",
   //       "events": [
-  //         {"time": "11:22", "event": "Hands off steering"},
-  //         {"time": "11:30", "event": "Drowsiness detected"},
-  //         {"time": "11:34", "event": "Lane deviation"},
-  //       ]
-  //     },
-  //     {
-  //       "title": "Session 2",
-  //       "date": "13-11-25",
-  //       "start": "10:02",
-  //       "end": "10:28",
-  //       "events": [
-  //         {"time": "10:04", "event": "Eyes off road"},
-  //         {"time": "10:10", "event": "Speeding warning"},
-  //       ]
-  //     },
-  //   ];
-  //   // ------------------------- //
-
-  //   setState(() => _isLoading = false);
+  //         {"time": "10:${12 + i}", "event": "Event A"},
+  //         {"time": "10:${20 + i}", "event": "Event B"},
+  //       ],
+  //     });
+  //   }
+  //   return mock;
   // }
+  // -------------------------------- //
 
   // ------ get user info from backend ------ //
   Future<void> _loadSession() async {
@@ -73,7 +57,7 @@ class _SessionLogPageState extends State<SessionLogPage> {
 
         setState(() {
           if (data is List) {
-            sessions = List<Map<String, dynamic>>.from(data);
+            sessions = List<Map<String, dynamic>>.from(data).reversed.toList();
           } else {
             sessions = [];
           }
@@ -88,6 +72,7 @@ class _SessionLogPageState extends State<SessionLogPage> {
         setState(() {
           _isLoading = false;
           sessions = [];
+          // sessions = generateMockSessions(5).reversed.toList(); // use mock data for debug
         });
       }
     }
@@ -117,7 +102,6 @@ class _SessionLogPageState extends State<SessionLogPage> {
             constraints: const BoxConstraints(maxWidth: double.infinity),
             child: Column(
               children: [
-                
                 const SizedBox(height: 16),
                 Text(
                   "Session Logs",

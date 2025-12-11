@@ -13,6 +13,7 @@ class ReportsPage extends StatefulWidget {
 class _ReportsPageState extends State<ReportsPage> {
   String? userID;
   bool _isLoading = true;
+  late final AlertSummary _summaryWidget;
 
   String _selectedCategory = "This Week";
   final List<String> _categories = ["This Week", "This Month"];
@@ -20,6 +21,7 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   void initState() {
     super.initState();
+     _summaryWidget = const AlertSummary(key: ValueKey('alert_summary')); // initialize summary widget only once
     _loadSession();
   }
 
@@ -37,8 +39,18 @@ class _ReportsPageState extends State<ReportsPage> {
   String getCurrentMonthName() {
     final now = DateTime.now();
     const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
     return monthNames[now.month - 1];
   }
@@ -95,10 +107,30 @@ class _ReportsPageState extends State<ReportsPage> {
         // Chart
         ReportsBarChart(category: _selectedCategory),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
+        // Divider
+        const Divider(
+          color: Colors.grey, // line color
+          thickness: 1, // line thickness
+          indent: 16, // left padding
+          endIndent: 16, // right padding
+        ),
+
+        Center(
+          child: const Text(
+            "Trend Analysis",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+        ),
+        Center(
+          child: const Text(
+            "Powered by AI",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
+          ),
+        ),
 
         // Summary text
-        AlertSummary(isWeekly: _selectedCategory == "This Week"),
+        _summaryWidget,
       ],
     );
   }

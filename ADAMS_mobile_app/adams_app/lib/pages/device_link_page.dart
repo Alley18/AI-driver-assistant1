@@ -58,7 +58,7 @@ class _DeviceLinkPageState extends State<DeviceLinkPage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => HomePage(username: username!, userID: userID),
+            builder: (_) => NavigationBarBottom(username: username!, userID: userID),
           ),
         );
       
@@ -66,6 +66,7 @@ class _DeviceLinkPageState extends State<DeviceLinkPage> {
           SnackBar(
             content: Text("Connected to $hardwareID."),
             backgroundColor: Colors.green,
+            duration: Duration(seconds: 1),
           ),
         );
         

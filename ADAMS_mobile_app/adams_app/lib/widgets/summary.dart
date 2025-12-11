@@ -1,41 +1,69 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
+import 'dart:async';
 import 'config.dart';
 
 class AlertSummary extends StatefulWidget {
-  final bool isWeekly; // true = weekly, false = monthly
-  const AlertSummary({Key? key, this.isWeekly = true}) : super(key: key);
+  const AlertSummary({Key? key}) : super(key: key);
 
   @override
   State<AlertSummary> createState() => _AlertSummaryState();
 }
 
 class _AlertSummaryState extends State<AlertSummary> {
-  double _totalAlerts = 0.0;
-  Timer? _timer;
+  String? _feedback;
+  String? _recommendedAction;
+  bool _isLoading = true;
   String? _userID;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _loadSessionAndData();
-
-    // Refresh every 3 seconds
     _timer = Timer.periodic(const Duration(seconds: 3), (_) {
-      _updateTotal();
+      _loadSummary();
     });
   }
 
-  // ------ load current user info ------ //
-  Future<void> _loadSessionAndData() async {
-    final sessionBox = await Hive.openBox('session');
-    _userID = sessionBox.get('userID');
-    await _updateTotal();
+  // ------ load user-specific data from backen ------ //
+  Future<void> _loadSummary() async {
+    try {
+      // Get userID from Hive
+      final sessionBox = await Hive.openBox('session');
+      _userID = sessionBox.get('userID');
+
+      // Fetch summary from backend
+      final url = Uri.parse(
+        '$baseUrl/feedback?userID=$_userID',
+      ); // adjust endpoint
+      final response = await http.get(url).timeout(const Duration(seconds: 3));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+
+        if (!mounted) return;
+        setState(() {
+          _feedback = jsonData['feedback'] ?? 'No feedback available';
+          _recommendedAction =
+              jsonData['recommended_action'] ??
+              'No recommended action available.';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _feedback =
+            'Error connecting to server.. [$e]';
+        _recommendedAction =
+            'Error connecting to server.. [$e]';
+        _isLoading = false;
+      });
+    }
   }
-  // ------------------------------------ //
+  // ------------------------------------------------- //
 
   @override
   void dispose() {
@@ -43,84 +71,69 @@ class _AlertSummaryState extends State<AlertSummary> {
     super.dispose();
   }
 
-  // ------ update total alerts for summary ------ //
-  Future<void> _updateTotal() async {
-    if (_userID == null) return;
-
-    try {
-      final endpoint = widget.isWeekly ? 'thisweek' : 'thismonth';
-      final url = Uri.parse('$baseUrl/$endpoint?userID=$_userID');
-      final response = await http.get(url);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        final values = jsonData.values.map((v) => v as int).toList();
-        final total = values.isEmpty ? 0.0 : values.reduce((a, b) => a + b).toDouble();
-
-        if (!mounted) return;
-        setState(() {
-          _totalAlerts = total;
-        });
-      }
-    } catch (e) {
-      debugPrint("Error updating total alerts: $e");
-    }
-  }
-  // --------------------------------------------- //
-
-  // ------ design ------//
+  // ------ design ------ //
   @override
   Widget build(BuildContext context) {
-    final period = widget.isWeekly ? "week" : "month";
-    final total = _totalAlerts;
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-    String alertLevel;
-    if (widget.isWeekly) {
-      if (total >= 10) {
-        alertLevel = "high";
-      } else if (total >= 5) {
-        alertLevel = "moderate";
-      } else {
-        alertLevel = "low";
-      }
-    } else {
-      if (total >= 40) {
-        alertLevel = "high";
-      } else if (total >= 20) {
-        alertLevel = "moderate";
-      } else {
-        alertLevel = "low";
-      }
-    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-    final summary =
-        "This $period, ${total.toStringAsFixed(0)} alerts were triggered.\n"
-        "The driver has a $alertLevel risk level.\n\n"
-        "${alertLevel == 'high'
-            ? '🚨 IMMEDIATE ACTION: \nReview driver behavior and take necessary precautions to drive safer.'
-            : alertLevel == 'moderate'
-            ? '⚠️ WARNING: Stay alert and drive responsibly to reduce your total. Avoid High Risk!'
-            : '✅ Great job – stay attentive and keep it up!'}";
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 16),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(12),
+          // Feedback Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 16, color: Colors.black, fontFamily: 'AlanSans'),
+                children: [
+                  const TextSpan(
+                    text: "💭 Feedback:\n\n",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'AlanSans'),
+                  ),
+                  TextSpan(
+                    text: _feedback ?? '',
+                    style: const TextStyle(fontWeight: FontWeight.normal, fontFamily: 'AlanSans'),
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: Text(
-            summary,
-            style: const TextStyle(fontSize: 16),
-            textAlign: TextAlign.left,
+
+          // Recommended Action Section
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 16, color: Colors.black, fontFamily: 'AlanSans'),
+                children: [
+                  const TextSpan(
+                    text: "✅ Recommended Action:\n\n",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'AlanSans'),
+                  ),
+                  TextSpan(
+                    text: _recommendedAction ?? '',
+                    style: const TextStyle(fontWeight: FontWeight.normal, fontFamily: 'AlanSans'),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -5,16 +5,16 @@ import 'package:idas_app/pages/settings_page.dart';
 import 'package:idas_app/pages/weekly_activity_page.dart';
 import 'package:idas_app/widgets/bottom_nav.dart';
 
-class HomePage extends StatefulWidget {
+class NavigationBarBottom extends StatefulWidget {
   final String username;
   final String? userID;
-  const HomePage({super.key, required this.username, this.userID});
+  const NavigationBarBottom({super.key, required this.username, this.userID});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<NavigationBarBottom> createState() => _NavigationBarBottomState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _NavigationBarBottomState extends State<NavigationBarBottom> {
   int _selectedIndex = 0;
   late List<Widget> _pages;
 

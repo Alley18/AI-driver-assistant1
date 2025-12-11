@@ -1,19 +1,26 @@
 # ADAMS Mobile Application
-ADAMS app delivers driver alertness data from hardware and backend systems through an intuitive interface, using charts and event logs for easy visualization.
+The ADAMS app converts raw alertness data collected from the hardware and backend into meaningful insights that help users understand their driving patterns. With AI-driven analysis and clean visualizations such as charts, summaries, and event logs, the app provides a comprehensive view of driver behavior and safety trends.
 
-# Important Features
-## Real-time Status
-The main page displays the driver's real-time status for monitoring.
-* Driver's Status: Normal, Distracted or Drowsy
-* Ring Chart: Distribution of Event Types
-* Event Logs: Events with Timestamps
+## Features
+- **Real-time Status**
+The main page that shows the driver's real-time status along with a quick overview of recent activity. It includes the driver's current state, a ring chart of event types, and a timestamped event log. 
   
-## Reports
-The 'Reports' page shows events during the current week and month. Users will be able to switch between weekly and montly reports.
-* Bar Chart: Visualizes events over time.
-* Summary: Provides a simple summary based on amount of events.
+- **Reports: Weekly and Monthly Charts**
+The Reports page provides an overview of weekly and monthly event trends, with an easy toggle between report periods. A bar chart visualizes how events occur over time.
 
-## Weekly Activity
-The ‘Weekly Activity’ page provides detailed information for the current week, similar to the ‘Real-time Status’ page, allowing users to review previous days’ data. Users will be able to scroll to view past data.
-* Ring Chart: Distribution of Event Types
-* Event Logs: Events with Timestamps
+- **Reports: Trend Analysis**
+The Trend Analysis feature uses an LLM to review the driver’s recent behavior, identify patterns, and generate clear feedback with recommended actions for safer driving.
+
+- **Weekly Activity**
+The Weekly Activity page offers a day-by-day breakdown of the current week, letting users scroll through past data. It features a ring chart of event types and a timestamped event log.
+
+- **Session Logs**
+The Session Logs page allows drivers to view all of their past driving sessions.
+
+- **Device Connection**
+The 'Link to you hardware' page handles device pairing, allowing users to register their ADAMS hardware using its unique ID so the app can authenticate and access the their data.
+
+## Tech Stack
+- **Framework:** Flutter
+- **Backend:** Flask
+- **Database:** Hive, ArangoDB

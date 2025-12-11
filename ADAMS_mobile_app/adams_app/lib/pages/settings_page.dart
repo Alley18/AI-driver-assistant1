@@ -19,11 +19,16 @@ class _SettingsPageState extends State<SettingsPage> {
   String? _username;
   String? _hardwareID;
   bool _isLoading = true;
+  bool _isHardwareOn = false;
+  late Box sessionBox;
 
   @override
   void initState() {
     super.initState();
+    Hive.openBox('session').then((box) {
+    sessionBox = box;
     _loadSession();
+  });
   }
 
   // ------ load current user info ------ //
@@ -31,6 +36,8 @@ class _SettingsPageState extends State<SettingsPage> {
     final sessionBox = await Hive.openBox('session');
     setState(() {
       _username = sessionBox.get('currentUser');
+      _hardwareID = sessionBox.get('hardwareID');
+      _isHardwareOn = sessionBox.get('isHardwareOn') ?? false;
       _hardwareID = sessionBox.get('hardwareID');
       _isLoading = false;
     });
@@ -65,18 +72,59 @@ class _SettingsPageState extends State<SettingsPage> {
     }
     try {
       final url = Uri.parse('$baseUrl/on-route');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'device_id': _hardwareID, 'status': 'on'}),
+      final response = await http.get(url);
+      await sessionBox.put('isHardwareOn', true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("$_hardwareID turned ON!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+        ),
       );
-
-      debugPrint("Sent!");
+      debugPrint("Hardware turned on!");
+      setState(() {
+        _isHardwareOn = true;
+      });
     } catch (e) {
       debugPrint("Error: $e");
     }
   }
-  // -------------------------------------- //
+  // ------------------------------- //
+
+  // ------ turn hardware off  ------ //
+  Future<void> _off() async {
+    debugPrint(_hardwareID);
+    if (_hardwareID == null || _hardwareID.toString().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "No hardware connected. Please link your device first.",
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    try {
+      final url = Uri.parse('$baseUrl/off-route');
+      final response = await http.get(url);
+      await sessionBox.put('isHardwareOn', false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("$_hardwareID turned OFF!"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 1),
+        ),
+      );
+      debugPrint("Hardware turned off!");
+      setState(() {
+        _isHardwareOn = false;
+      });
+    } catch (e) {
+      debugPrint("Error: $e");
+    }
+  }
+  // -------------------------------- //
 
   // ------ design ------ //
   @override
@@ -98,23 +146,25 @@ class _SettingsPageState extends State<SettingsPage> {
                   style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: 200,
-                  height: 40,
-                  child: ElevatedButton(
-                    onPressed: _on,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      "Turn On Hardware",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ),
+                // SizedBox(
+                //   width: 200,
+                //   height: 40,
+                //   child: ElevatedButton(
+                //     onPressed: _isHardwareOn ? _off : _on,
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: _isHardwareOn
+                //           ? Colors.red
+                //           : Colors.lightBlue,
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(12),
+                //       ),
+                //     ),
+                //     child: Text(
+                //       _isHardwareOn ? "Turn OFF Hardware" : "Turn ON Hardware",
+                //       style: TextStyle(fontSize: 16, color: Colors.white),
+                //     ),
+                //   ),
+                // ),
 
                 const SizedBox(height: 16),
                 ListTile(

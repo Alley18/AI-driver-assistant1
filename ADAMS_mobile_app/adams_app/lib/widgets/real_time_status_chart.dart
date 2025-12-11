@@ -16,6 +16,7 @@ class RealTimeStatusReport extends StatefulWidget {
 class _RealTimeStatusReportState extends State<RealTimeStatusReport> {
   Map<String, double>? dataMap;
   final colorList = <Color>[
+    const Color.fromARGB(255, 49, 1, 131),
     const Color(0xff5409DA),
     const Color(0xff4E71FF),
     const Color(0xff8DD8FF),
@@ -87,8 +88,8 @@ class _RealTimeStatusReportState extends State<RealTimeStatusReport> {
 
     return Center(
       child: SizedBox(
-        width: 350,
-        height: 350,
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: 500,
         child: PieChart(
           dataMap: hasData ? dataMap! : {"": 1.0},
           animationDuration: const Duration(milliseconds: 800),
