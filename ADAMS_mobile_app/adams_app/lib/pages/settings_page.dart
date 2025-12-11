@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:idas_app/pages/device_link_page.dart';
 import 'package:idas_app/pages/login_page.dart';
 import 'package:idas_app/pages/session_log_page.dart';
-import 'package:idas_app/widgets/config.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key}); // no username needed
@@ -17,9 +13,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String? _username;
-  String? _hardwareID;
   bool _isLoading = true;
-  bool _isHardwareOn = false;
   late Box sessionBox;
 
   @override
@@ -36,9 +30,6 @@ class _SettingsPageState extends State<SettingsPage> {
     final sessionBox = await Hive.openBox('session');
     setState(() {
       _username = sessionBox.get('currentUser');
-      _hardwareID = sessionBox.get('hardwareID');
-      _isHardwareOn = sessionBox.get('isHardwareOn') ?? false;
-      _hardwareID = sessionBox.get('hardwareID');
       _isLoading = false;
     });
   }
