@@ -23,24 +23,6 @@ class _SessionLogPageState extends State<SessionLogPage> {
     _loadSession();
   }
 
-  // ------ generate mock data ------ //
-  // List<Map<String, dynamic>> generateMockSessions(int count) {
-  //   final List<Map<String, dynamic>> mock = [];
-  //   for (int i = 0; i < count; i++) {
-  //     mock.add({
-  //       "date": "${14 + i}-11-25",
-  //       "start": "10:${10 + i}",
-  //       "end": "10:${30 + i}",
-  //       "events": [
-  //         {"time": "10:${12 + i}", "event": "Event A"},
-  //         {"time": "10:${20 + i}", "event": "Event B"},
-  //       ],
-  //     });
-  //   }
-  //   return mock;
-  // }
-  // -------------------------------- //
-
   // ------ get user info from backend ------ //
   Future<void> _loadSession() async {
     try {
@@ -72,7 +54,6 @@ class _SessionLogPageState extends State<SessionLogPage> {
         setState(() {
           _isLoading = false;
           sessions = [];
-          // sessions = generateMockSessions(5).reversed.toList(); // use mock data for debug
         });
       }
     }

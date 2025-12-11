@@ -90,24 +90,6 @@ class _LoginPageState extends State<LoginPage> {
   }
   // ------------------------------------------------------- //
 
-  void _skipLogin() async {
-    const dummyUsername = "Guest";
-    const dummyUserID = "0"; // or any string ID
-
-    // Optionally save a session so app thinks a user is logged in
-    final sessionBox = await Hive.openBox('session');
-    await sessionBox.put('currentUser', dummyUsername);
-    await sessionBox.put('userID', dummyUserID);
-
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => NavigationBarBottom(username: dummyUsername, userID: dummyUserID),
-      ),
-    );
-  }
-
   // ------ design ------ //
   @override
   Widget build(BuildContext context) {
@@ -219,27 +201,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-
-              // ------ skip login for debug ------ //
-              // const SizedBox(height: 8),
-              // SizedBox(
-              //   width: 150,
-              //   height: 40,
-              //   child: ElevatedButton(
-              //     onPressed: _skipLogin,
-              //     style: ElevatedButton.styleFrom(
-              //       backgroundColor: Colors.orange.shade300,
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(12),
-              //       ),
-              //     ),
-              //     child: const Text(
-              //       "Skip Login",
-              //       style: TextStyle(fontSize: 16, color: Colors.black),
-              //     ),
-              //   ),
-              // ),
-              // ---------------------------------- //
             ],
           ),
         ),

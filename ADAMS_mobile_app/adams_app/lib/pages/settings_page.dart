@@ -56,76 +56,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   // -------------------------------------------------------------- //
 
-  // ------ turn hardware on  ------ //
-  Future<void> _on() async {
-    debugPrint(_hardwareID);
-    if (_hardwareID == null || _hardwareID.toString().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "No hardware connected. Please link your device first.",
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-    try {
-      final url = Uri.parse('$baseUrl/on-route');
-      final response = await http.get(url);
-      await sessionBox.put('isHardwareOn', true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("$_hardwareID turned ON!"),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 1),
-        ),
-      );
-      debugPrint("Hardware turned on!");
-      setState(() {
-        _isHardwareOn = true;
-      });
-    } catch (e) {
-      debugPrint("Error: $e");
-    }
-  }
-  // ------------------------------- //
-
-  // ------ turn hardware off  ------ //
-  Future<void> _off() async {
-    debugPrint(_hardwareID);
-    if (_hardwareID == null || _hardwareID.toString().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            "No hardware connected. Please link your device first.",
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-    try {
-      final url = Uri.parse('$baseUrl/off-route');
-      final response = await http.get(url);
-      await sessionBox.put('isHardwareOn', false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("$_hardwareID turned OFF!"),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 1),
-        ),
-      );
-      debugPrint("Hardware turned off!");
-      setState(() {
-        _isHardwareOn = false;
-      });
-    } catch (e) {
-      debugPrint("Error: $e");
-    }
-  }
-  // -------------------------------- //
-
   // ------ design ------ //
   @override
   Widget build(BuildContext context) {
@@ -145,27 +75,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   "Settings",
                   style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 10),
-                // SizedBox(
-                //   width: 200,
-                //   height: 40,
-                //   child: ElevatedButton(
-                //     onPressed: _isHardwareOn ? _off : _on,
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: _isHardwareOn
-                //           ? Colors.red
-                //           : Colors.lightBlue,
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(12),
-                //       ),
-                //     ),
-                //     child: Text(
-                //       _isHardwareOn ? "Turn OFF Hardware" : "Turn ON Hardware",
-                //       style: TextStyle(fontSize: 16, color: Colors.white),
-                //     ),
-                //   ),
-                // ),
-
                 const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.add_circle_outline, size: 25),

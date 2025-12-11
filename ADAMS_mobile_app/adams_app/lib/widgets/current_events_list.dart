@@ -19,7 +19,6 @@ class _CurrentEventsListState extends State<CurrentEventsList> {
   Timer? _timer;
   String? latestEventKey; // unique key for highlighting
   late Box sessionBox;
-  bool useMock = false; // debug
 
   @override
   void initState() {
@@ -32,31 +31,8 @@ class _CurrentEventsListState extends State<CurrentEventsList> {
     });
   }
 
-  // ------ mock data for debugging ------ //
-  // int mockCounter = 0;
-  // String hhmm(DateTime dt) => "${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}";
-
-  // Future<List<Map<String, String>>> _mockEvents() async {
-  //   await Future.delayed(const Duration(seconds: 2)); // simulate backend delay
-  //   mockCounter++;
-
-  //   final now = DateTime.now();
-
-  //   List<Map<String, String>> list = [
-  //     {"time": hhmm(now.subtract(Duration(minutes: 2))), "type": "Yawning"},
-  //     {"time": hhmm(now.subtract(Duration(minutes: 1))), "type": "Drowsy"},
-  //     {"time": hhmm(now.subtract(Duration(minutes: 1))), "type": "Drowsy"}, // same time & type
-  //     {"time": hhmm(now.add(Duration(seconds: mockCounter))), "type": "NEW Event #$mockCounter"},
-  //   ];
-
-  //   list.sort((a, b) => b["time"]!.compareTo(a["time"]!));
-  //   return list;
-  // }
-  // --------------------------------------- //
-
   // ------ load user-specific data ------ //
   Future<List<Map<String, String>>> loadEventLog(String? userID) async {
-    // if (useMock) return _mockEvents();
     if (userID == null) return [];
 
     final url = Uri.parse('$baseUrl/current-events-list?userID=$userID');
