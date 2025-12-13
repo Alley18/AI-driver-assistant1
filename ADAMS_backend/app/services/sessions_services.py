@@ -1,6 +1,6 @@
-from ..db.arango_db import db
-from .auth_services import get_deviceid
-from .storing_services import save_session
+from app.db.arango_db import db
+from app.services.auth_services import get_deviceid
+from app.services.storing_services import save_session
 
 def create_session(device_id, off_time):
     # Find the latest ON event before the OFF event time

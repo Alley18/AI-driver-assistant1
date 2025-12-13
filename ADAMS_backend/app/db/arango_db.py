@@ -19,6 +19,7 @@ if not sys_db.has_database(DB_NAME):
 db = client.db(DB_NAME, username=USERNAME, password=PASSWORD)
 
 # Create collections if missing
-for name in ["state", "event", "sessions", "summary", "trend", "users", "users_devices", "authorized_device", "feedback"]:
+for name in ["state", "event", "sessions", "summary", "trend", "users", 
+             "users_devices", "authorized_device", "feedback"]:
     if not db.has_collection(name):
         db.create_collection(name)

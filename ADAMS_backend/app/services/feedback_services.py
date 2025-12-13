@@ -2,9 +2,9 @@ import json
 from datetime import datetime
 from typing import Dict, Any, Optional
 from app.db.arango_db import db
-from .auth_services import get_deviceid
-from .storing_services import save_feedback
-from ..ai.llm_feedback import generate_driving_coach_feedback, parse_feedback_response
+from app.services.auth_services import get_deviceid
+from app.services.storing_services import save_feedback
+from app.ai.llm_feedback import generate_driving_coach_feedback, parse_feedback_response
 
 def generate_feedback(device_id) -> Dict[str, Any]:
     summary = fetch_latest_summary(device_id)

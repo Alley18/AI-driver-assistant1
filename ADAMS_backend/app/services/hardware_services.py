@@ -1,7 +1,7 @@
-from .storing_services import save_state, save_event
-from .sessions_services import create_session
-from .summary_services import create_summary, store_trends_summary
-from .feedback_services import generate_feedback
+from app.services.storing_services import save_state, save_event
+from app.services.sessions_services import create_session
+from app.services.summary_services import create_summary, store_trends_summary
+from app.services.feedback_services import generate_feedback
 from datetime import datetime
 
 

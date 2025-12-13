@@ -1,57 +1,17 @@
 import requests
 from flask import Blueprint, request, jsonify
-from ..services.auth_services import get_userid, is_userid_provided, auth_match, hash_password, is_authorized_device, get_deviceid
-from ..services.storing_services import save_user, save_device
-from ..services.hardware_services import store_state ,store_event
-from ..services.client_services import get_today_log, get_event_count, get_driver_state, get_weekly_report, get_monthly_report, get_weekly_event, get_weekly_log
-from ..services.sessions_services import get_sessions
-from ..services.feedback_services import fetch_feedback
+from app.services.auth_services import get_userid, is_userid_provided, auth_match, hash_password, is_authorized_device, get_deviceid
+from app.services.storing_services import save_user, save_device
+from app.services.hardware_services import store_state ,store_event
+from app.services.client_services import get_today_log, get_event_count, get_driver_state, get_weekly_report, get_monthly_report, get_weekly_event, get_weekly_log
+from app.services.sessions_services import get_sessions
+from app.services.feedback_services import fetch_feedback
 
-HARDWARE_IP = "172.19.23.147"
 api_bp = Blueprint("api", __name__)
-
-#----------------------------------------------------------#
-#----------------------llm route---------------------------#
-#----------------------------------------------------------#
-@api_bp.route("/feedback", methods=["GET"])
-def get_feedback():
-    user_id = request.args.get("userID", None)
-    result = fetch_feedback(user_id)
-    return jsonify(result)
 
 #----------------------------------------------------------#
 #-------------------hardware route-------------------------#
 #----------------------------------------------------------#
-@api_bp.route("/on-route", methods=["GET"])
-def start_session():
-    try:
-        resp = requests.get(f"http://{HARDWARE_IP}:8080/start", timeout=5)
-        return jsonify({
-            "status": "session_started",
-            "status_code": resp.status_code
-        }), resp.status_code
-    except requests.exceptions.RequestException as e:
-        return jsonify({
-            "status": "error",
-            "error": str(e)
-        }), 500
-
-
-@api_bp.route("/off-route", methods=["GET"])
-def stop_session():
-    try:
-        resp = requests.get(f"http://{HARDWARE_IP}:8080/stop", timeout=5)
-        return jsonify({
-            "status": "session_stopped",
-            "status_code": resp.status_code
-        }), resp.status_code
-    except requests.exceptions.RequestException as e:
-        return jsonify({
-            "status": "error",
-            "error": str(e)
-        }), 500
-
-
 @api_bp.route("/kucing-event", methods=["POST"]) 
 def receive_event():
     data = request.get_json()
@@ -199,3 +159,41 @@ def fetch_all_sessions():
     data = get_sessions(user_id)
     return jsonify(data)
 
+#----------------------llm route---------------------------#
+@api_bp.route("/feedback", methods=["GET"])
+def get_feedback():
+    user_id = request.args.get("userID", None)
+    result = fetch_feedback(user_id)
+    return jsonify(result)
+
+#----------------------future route---------------------------#
+HARDWARE_IP = "172.19.23.147"
+
+@api_bp.route("/on-route", methods=["GET"])
+def start_session():
+    try:
+        resp = requests.get(f"http://{HARDWARE_IP}:8080/start", timeout=5)
+        return jsonify({
+            "status": "session_started",
+            "status_code": resp.status_code
+        }), resp.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+
+@api_bp.route("/off-route", methods=["GET"])
+def stop_session():
+    try:
+        resp = requests.get(f"http://{HARDWARE_IP}:8080/stop", timeout=5)
+        return jsonify({
+            "status": "session_stopped",
+            "status_code": resp.status_code
+        }), resp.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500

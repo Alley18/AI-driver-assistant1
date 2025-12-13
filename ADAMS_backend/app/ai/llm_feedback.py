@@ -45,7 +45,7 @@ def generate_driving_coach_feedback(session_summary_json: str, trend_json: str) 
             {"role": "user", "content": user_message}
         ],
         "max_tokens": 300,
-        "temperature": 0.4,  # Reduced for consistency
+        "temperature": 0.4, 
         "response_format": {
             "type": "json_schema",
             "json_schema": {
@@ -60,8 +60,6 @@ def generate_driving_coach_feedback(session_summary_json: str, trend_json: str) 
         "Content-Type": "application/json",
     }
 
-    print(f"🔍 Calling Perplexity...")  # Debug
-
     response = requests.post(BASE_URL, json=payload, headers=headers, timeout=30)
     response.raise_for_status()
     
@@ -75,7 +73,9 @@ def generate_driving_coach_feedback(session_summary_json: str, trend_json: str) 
 
 
 def parse_feedback_response(feedback_dict: Dict[str, str]) -> Dict[str, str]:
-    """Legacy fallback - now rarely needed with structured outputs."""
+    """Legacy fallback - now rarely needed with structured outputs.
+        in case someone take over this project, might try delete this and see if it affect the schema
+    """
     feedback = feedback_dict.get("feedback", "")
     action = feedback_dict.get("recommended_action", "")
     

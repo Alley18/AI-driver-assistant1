@@ -1,6 +1,6 @@
-from ..ai.trend_analysis import analyze_driver_trends
-from ..db.arango_db import db
-from .storing_services import save_trend
+from app.ai.trend_analysis import analyze_driver_trends
+from app.db.arango_db import db
+from app.services.storing_services import save_trend
 from datetime import datetime
 
 def create_summary(device_id, off_time):

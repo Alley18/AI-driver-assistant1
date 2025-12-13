@@ -1,10 +1,6 @@
-from ..db.arango_db import db
-from .time_services import return_today, return_from_monday
-from .auth_services import get_deviceid
-
-#----------------------------------------------------------#
-#-------------------frontend ingest------------------------#
-#----------------------------------------------------------#
+from app.db.arango_db import db
+from app.services.time_services import return_today, return_from_monday
+from app.services.auth_services import get_deviceid
 
 #----------------------------------------------------------#
 #------------------frontend display------------------------#
@@ -13,7 +9,6 @@ from .auth_services import get_deviceid
 #-----------------------------------------------
 #home
 #-----------------------------------------------
-#change al to support user id
 #/current-events-list 
 def get_today_log(user_id):
     device_id = get_deviceid(user_id)
