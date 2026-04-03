@@ -1,0 +1,11 @@
+Initial emotion labels for version 1:
+
+1. Happy
+2. Sad
+3. Angry
+4. Neutral
+5. Surprised
+
+Reason:
+We selected a small set of basic emotions to keep the first version simple, 
+.\.venv\Scripts\Activate.ps1

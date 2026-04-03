@@ -1,0 +1,9 @@
+Endpoint: POST /emotion-detect
+
+Purpose:
+Send detected emotion result from model to backend/frontend.
+
+Fields:
+- emotion: detected driver emotion (happy, sad, etc.)
+- confidence: prediction confidence score
+- timestamp: time of detection
