@@ -1,0 +1,45 @@
+timestamp,input,level,message,buzzer
+4/1/2026 11:20,Driver is looking at the road.,INFO,Driver attentive,FALSE
+4/1/2026 11:20,Driver just yawned.,WARNING,Driver yawned.,TRUE
+4/1/2026 11:20,Driver's eyes have been closed for 3 seconds!,DANGER,Driver's eyes closed for 3 seconds!,TRUE
+4/1/2026 11:20,Driver is holding a smartphone.,DANGER,Driver holding smartphone.,TRUE
+4/1/2026 11:21,"Eye openness: 90%, Gaze: Forward, Phone: NO",INFO,Driver is attentive and focused,FALSE
+4/1/2026 11:21,"Eye openness: 10%, Yawning: YES, Duration: 3s",DANGER,"Driver severely drowsy, needs to rest",TRUE
+4/1/2026 11:22,"Eye openness: 85%, Gaze: Downward, Phone: YES",DANGER,Distracted driving detected,TRUE
+4/1/2026 11:22,"Heart rate: 110bpm, Shouting detected, Gaze: Erratic",DANGER,"Driver distressed, erratic gaze detected.",TRUE
+2026-04-10 10:40:51,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:40:51,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:40:51,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:40:51,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:46:53,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:46:54,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:46:54,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:46:54,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:47:50,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:47:50,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:47:51,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:47:51,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:50:29,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:50:32,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:50:35,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:50:38,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:51:06,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:51:09,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:51:12,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:51:15,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:53:34,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:53:37,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:53:41,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:53:44,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:55:25,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:55:29,"Eye openness: 5%, Yawning: YES, Duration: 3s",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:55:32,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 10:55:35,"Eye openness: 90%, Emotion: Happy, Gaze: Road",ERROR,AI System Offline,False,FASTEST
+2026-04-10 11:05:32,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",INFO,"Driving calmly, no need to adjust",False,FASTEST
+2026-04-10 11:05:35,"Eye openness: 5%, Yawning: YES, Duration: 3s",DANGER,"Driver eyes closed, resting recommended",True,REST_STOP
+2026-04-10 11:05:38,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",WARNING,"Anger detected, adjust driving",False,SCENIC
+2026-04-10 11:05:42,"Eye openness: 90%, Emotion: Happy, Gaze: Road",INFO,You are in a good state,False,FASTEST
+2026-04-10 14:36:50,"Eye openness: 95%, Emotion: Neutral, Gaze: Forward",INFO,Driver is relaxed and alert,False,FASTEST
+2026-04-10 14:36:58,"Eye openness: 5%, Yawning: YES, Duration: 3s",DANGER,"Driver sleepy, take a break now",True,REST_STOP
+2026-04-10 14:37:10,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",WARNING,"Angry, avoid distraction",False,SCENIC
+2026-04-10 14:37:14,"Eye openness: 90%, Emotion: Happy, Gaze: Road",INFO,"Driving well, focus on the road",False,FASTEST
