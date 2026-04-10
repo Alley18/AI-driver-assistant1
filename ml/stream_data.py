@@ -1,32 +1,47 @@
 import requests
 import time
 
-# Update this with the real IP when ready
-BACKEND_URL = "http://127.0.0.1:5000/driver-status" 
+# Use Port 8000 as per Ali's latest update
+BACKEND_URL = "http://127.0.0.1:8000/driver-status" 
 
 def get_live_telemetry():
-    # In the future, this will pull from the actual camera
+    """
+    AI Lead's bridge: This will eventually be replaced by real 
+    values from vision_node.py
+    """
     return {
         "eye_opening": 0.05,        # 5% (Very tired)
         "is_yawning": True,
         "emotion": "Tired",
-        "gaze": "Forward"
+        "gaze": "Forward",
+        "confidence": 92.0
     }
 
-def send_to_backend(payload):
+def send_status(eye_status, emotion, confidence):
     """
-    Your teammate's logic for sending data to the server.
-    We will call this inside the AI Brain loop.
+    Ali's backend logic: Sends data to the Flask/FastAPI server.
     """
+    payload = {
+        "eye_status": eye_status,
+        "emotion": emotion,
+        "confidence": confidence,
+        "timestamp": time.time()
+    }
+
     try:
-        response = requests.post(BACKEND_URL, json=payload)
+        response = requests.post(BACKEND_URL, json=payload, timeout=5)
+        print(f"🚀 Data Pushed: {emotion} | Server Response: {response.status_code}")
         return response.status_code
-    except:
+    except Exception as e:
+        print(f"⚠️ Backend unreachable: {e}")
         return "Offline"
 
 if __name__ == "__main__":
-    # Test the loop
+    print("--- ADAMS Stream Integration Test ---")
+    # Test the logic
     data = get_live_telemetry()
-    print(f"Testing Local Data: {data}")
-    # status = send_to_backend(data)
-    # print(f"Backend Status: {status}")
+    send_status(
+        eye_status="closed" if data["eye_opening"] < 0.2 else "open",
+        emotion=data["emotion"],
+        confidence=data["confidence"]
+    )
