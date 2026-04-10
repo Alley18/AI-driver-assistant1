@@ -1,78 +1,90 @@
 import os
-import json  # <--- CRITICAL: Added this
-from google import genai
+import json
+from groq import Groq
 from dotenv import load_dotenv
 
-# 1. Path Logic: Look for .env (Adjust ".." if your .env is in the same folder)
+# --- INITIALIZATION LOGIC ---
+# This part MUST run before the class is used to ensure keys are loaded
 basedir = os.path.abspath(os.path.dirname(__file__))
-dotenv_path = os.path.join(basedir, "..", ".env") 
-load_dotenv(dotenv_path)
+# Check both the current folder and the parent folder for .env
+dotenv_paths = [
+    os.path.join(basedir, ".env"),
+    os.path.join(basedir, "..", ".env")
+]
+
+for path in dotenv_paths:
+    if os.path.exists(path):
+        load_dotenv(path)
+        break
 
 class AdamsBrain:
     def __init__(self):
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("Error: GEMINI_API_KEY not found in .env file!")
-            
-        # Initialize the client
-        self.client = genai.Client(api_key=api_key)
+        # Fetch key from environment
+        api_key = os.getenv("GROQ_API_KEY")
         
-        # Use the high-speed 2.5 Flash model
-        self.model_id = "gemini-2.0-flash" # Note: Official name is 2.0 Flash
+        if not api_key:
+            raise ValueError("❌ ERROR: GROQ_API_KEY not found! Ensure it is in your .env file.")
+            
+        self.client = Groq(api_key=api_key)
+        # Llama 3.1 8B is the best balance of speed and logic for safety tasks
+        self.model = "llama-3.1-8b-instant" 
 
     def generate_advice(self, driver_state):
-        # 1. Validation: Don't call API for empty or "noise" data
+        """
+        Processes driver telemetry and returns safety instructions in JSON.
+        """
+        # Quick validation for empty inputs
         if not driver_state or len(driver_state) < 3:
             return json.dumps({
                 "level": "INFO",
                 "message": "Scanning environment...",
-                "buzzer_active": False
+                "buzzer_active": False,
+                "suggested_route": "FASTEST"
             })
 
         try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=f"Driver Telemetry: {driver_state}",
-                config={
-                    "response_mime_type": "application/json",
-                    "system_instruction": (
-                        "You are the ADAMS Safety Controller. "
-                        "Analyze telemetry and return JSON: "
-                        "{'level': 'INFO'|'WARNING'|'DANGER', "
-                        "'message': str(max 8 words), "
-                        "'buzzer_active': bool}"
-                    )
-                }
+            chat_completion = self.client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "system", 
+                        "content": (
+                            "You are the ADAMS Safety Controller (Advanced Driver Alertness Monitoring System). "
+                            "Analyze telemetry and return JSON. "
+                            "1. If SLEEPY/EYES CLOSED: level='DANGER', buzzer_active=true, route='REST_STOP'. "
+                            "2. If ANGRY/STRESSED/DISTRACTED: level='WARNING', buzzer_active=false, route='SCENIC'. "
+                            "3. If NEUTRAL/HAPPY: level='INFO', buzzer_active=false, route='FASTEST'. "
+                            "Format exactly: {'level': str, 'message': str(max 8 words), 'buzzer_active': bool, 'suggested_route': str}"
+                        )
+                    },
+                    {"role": "user", "content": f"Telemetry Data: {driver_state}"}
+                ],
+                model=self.model,
+                response_format={"type": "json_object"} # Groq forces valid JSON output
             )
             
-            # 2. Safety Check: Validate JSON before returning
-            result = response.text
-            json.loads(result) # If this fails, it jumps to 'except'
-            return result
+            # Extract and return the JSON string
+            return chat_completion.choices[0].message.content
 
         except Exception as e:
-            # 3. Fail-Safe: Default response if API is down or JSON is malformed
+            print(f"⚠️ Groq API Error: {e}")
+            # Reliable fail-safe response
             return json.dumps({
-                "level": "ERROR",
-                "message": "AI System Offline",
-                "buzzer_active": False
+                "level": "ERROR", 
+                "message": "Safety AI Offline", 
+                "buzzer_active": False,
+                "suggested_route": "FASTEST"
             })
 
     def filter_notifications(self, driver_level, notification_text):
         """
-        Focus Mode Logic: Blocks distracting alerts during high-risk states.
+        Focus Mode: Blocks phone alerts if driver is in a high-risk state.
         """
         if driver_level in ["DANGER", "WARNING"]:
-            return f"[BLOCKED] Focus on the road. Notification suppressed."
+            return "[BLOCKED] High-risk state: Focus on the road."
         return f"[ALLOWED] {notification_text}"
 
 if __name__ == "__main__":
+    # Quick internal test
     adams = AdamsBrain()
-    print("--- ADAMS AI TEST ---")
-    
-    # Test 1: Critical Event
-    result = adams.generate_advice("eyes closed for 3 seconds")
-    print(f"Advice JSON: {result}")
-    
-    # Test 2: Focus Mode during Danger
-    print(f"Focus Mode Test: {adams.filter_notifications('DANGER', 'Meeting Invite')}")
+    print("Testing Brain with local data...")
+    print(adams.generate_advice("eyes closed, duration 2s"))
