@@ -3,14 +3,16 @@ import requests
 import time
 from deepface import DeepFace
 
-BACKEND_URL = "http://127.0.0.1:8000/driver-status"
+# CRITICAL: If the Pi is sending to another laptop, change 127.0.0.1 
+# to the actual IP address of the Backend laptop!
+BACKEND_URL = "http://172.19.0.28:8000/driver-status"
 
-print("Starting vision node...")
+print("Starting ADAMS Vision Node...")
 
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
-    print("Error: Cannot open camera")
+    print("❌ Error: Cannot open camera")
     exit()
 
 last_sent_time = 0
@@ -27,8 +29,9 @@ while True:
 
     current_time = time.time()
 
+    # Only run heavy detection every 3 seconds to avoid lagging the Pi
     if current_time - last_sent_time > 3:
-        print("Trying emotion detection...")
+        print("Running Emotion Analysis...")
 
         try:
             result = DeepFace.analyze(
@@ -43,43 +46,36 @@ while True:
             emotion = result["dominant_emotion"]
             confidence = float(result["emotion"][emotion])
 
-            current_emotion_text = f"{emotion} ({confidence:.1f})"
-            print("Detected:", current_emotion_text)
+            current_emotion_text = f"{emotion} ({confidence:.1f}%)"
+            print(f"Detected: {current_emotion_text}")
 
             payload = {
-                "eye_status": "open",
+                "eye_status": "open", # Placeholder until EAR logic is added
                 "emotion": emotion,
                 "confidence": confidence,
                 "timestamp": time.time()
             }
 
             try:
+                # Sending data to the Backend
                 response = requests.post(BACKEND_URL, json=payload, timeout=5)
-                print("Sent to backend:", response.json())
+                print("Backend Response:", response.status_code)
             except Exception as e:
-                print("Backend send error:", e)
+                print("📡 Backend send error (Is the server running?):", e)
 
         except Exception as e:
             current_emotion_text = "Error"
-            print("Emotion detection error:", e)
+            print("ML Detection error:", e)
 
         last_sent_time = current_time
 
-    cv2.putText(
-        frame,
-        f"Emotion: {current_emotion_text}",
-        (20, 40),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        (0, 255, 0),
-        2
-    )
+    # Draw status on the screen
+    cv2.putText(frame, f"Emotion: {current_emotion_text}", (20, 40),
+                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-    cv2.imshow("Emotion Camera", frame)
+    cv2.imshow("ADAMS - Driver Monitor", frame)
 
-    key = cv2.waitKey(1) & 0xFF
-    if key == ord("q") or key == 27:
-        print("Closing camera...")
+    if cv2.waitKey(1) & 0xFF in [ord("q"), 27]:
         break
 
 cap.release()
