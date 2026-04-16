@@ -104,3 +104,180 @@ timestamp,input,level,message,buzzer
 2026-04-16 13:44:38,"Time: 13:44, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 86%, Distracted: False, Head yaw: +5.1°",WARNING,Stay calm now,False,SCENIC
 2026-04-16 13:44:45,"Time: 13:44, Driver active for 45 min, Trigger: DISTRACTED, Emotion: Stressed, Eye openness: 100%, Distracted: True, Head yaw: +48.5°",WARNING,Stay focused now,False,SCENIC
 2026-04-16 13:44:48,"Time: 13:44, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 14:21:37,"Time: 14:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +3.5°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 14:21:43,"Time: 14:21, Driver active for 45 min, Trigger: DISTRACTED, Emotion: Neutral, Eye openness: 100%, Distracted: True, Head yaw: +22.9°",WARNING,Stay focused,False,SCENIC
+2026-04-16 14:21:56,"Time: 14:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +14.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 14:22:02,"Time: 14:22, Driver active for 45 min, Trigger: DISTRACTED, Emotion: Angry, Eye openness: 100%, Distracted: True, Head yaw: +36.2°",WARNING,Stay focused now,False,SCENIC
+2026-04-16 14:22:06,"Time: 14:22, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 40%, Distracted: False, Head yaw: +3.7°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 14:22:07,"Time: 14:22, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 36%, Distracted: False, Head yaw: +3.8°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:05:26,"Time: 15:05, Driver active for 45 min, Trigger: DISTRACTED, Emotion: Neutral, Eye openness: 78%, Distracted: True, Head yaw: +30.1°",WARNING,Stay focused,False,SCENIC
+2026-04-16 15:05:27,"Time: 15:05, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 21%, Distracted: False, Head yaw: +1.8°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:05:28,"Time: 15:05, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 24%, Distracted: False, Head yaw: +3.3°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:07:23,"Time: 15:07, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:07:33,"Time: 15:07, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:07:43,"Time: 15:07, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +1.0°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:07:53,"Time: 15:07, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 96%, Distracted: False, Head yaw: -2.4°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:08:03,"Time: 15:08, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.4°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:08:14,"Time: 15:08, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:08:24,"Time: 15:08, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -3.6°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:08:34,"Time: 15:08, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:08:44,"Time: 15:08, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:08:54,"Time: 15:08, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 35%, Distracted: False, Head yaw: -4.2°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:09:04,"Time: 15:09, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:09:14,"Time: 15:09, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 95%, Distracted: False, Head yaw: +0.1°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:09:24,"Time: 15:09, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +1.2°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:09:34,"Time: 15:09, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:09:44,"Time: 15:09, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.9°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:09:54,"Time: 15:09, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 63%, Distracted: False, Head yaw: -0.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:10:04,"Time: 15:10, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +3.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:10:14,"Time: 15:10, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +4.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:10:28,"Time: 15:10, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.5°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:10:37,"Time: 15:10, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -4.5°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:10:48,"Time: 15:10, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:10:59,"Time: 15:10, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.5°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:11:09,"Time: 15:11, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +8.6°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:11:19,"Time: 15:11, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:11:29,"Time: 15:11, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 67%, Distracted: False, Head yaw: -3.7°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:11:37,"Time: 15:11, Driver active for 45 min, Trigger: DROWSY, Emotion: Happy, Eye openness: 37%, Distracted: False, Head yaw: +1.1°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:11:47,"Time: 15:11, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.6°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:11:57,"Time: 15:11, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 30%, Distracted: False, Head yaw: -5.0°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:12:07,"Time: 15:12, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.6°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:12:17,"Time: 15:12, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.6°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:12:28,"Time: 15:12, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -5.3°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:12:37,"Time: 15:12, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 24%, Distracted: False, Head yaw: -3.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:12:47,"Time: 15:12, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:13:08,"Time: 15:13, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.9°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:13:17,"Time: 15:13, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.1°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:13:28,"Time: 15:13, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +10.1°",WARNING,Stay calm please,False,SCENIC
+2026-04-16 15:13:38,"Time: 15:13, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +7.8°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:13:48,"Time: 15:13, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +5.3°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:14:04,"Time: 15:14, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -3.0°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:14:14,"Time: 15:14, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.5°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:14:24,"Time: 15:14, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +2.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:14:34,"Time: 15:14, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -4.3°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:14:52,"Time: 15:14, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +8.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:15:02,"Time: 15:15, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.9°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:15:12,"Time: 15:15, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -4.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:15:22,"Time: 15:15, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.8°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:15:32,"Time: 15:15, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.8°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:15:48,"Time: 15:15, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +8.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:15:58,"Time: 15:15, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +5.5°",WARNING,Calm down,False,SCENIC
+2026-04-16 15:16:08,"Time: 15:16, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:16:18,"Time: 15:16, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 100%, Distracted: False, Head yaw: +7.8°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:16:40,"Time: 15:16, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 28%, Distracted: False, Head yaw: -12.5°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:16:51,"Time: 15:16, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.9°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:17:01,"Time: 15:17, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -6.2°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:17:21,"Time: 15:17, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.6°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:17:31,"Time: 15:17, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +7.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:17:41,"Time: 15:17, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.6°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:17:51,"Time: 15:17, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -3.0°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:18:01,"Time: 15:18, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:18:13,"Time: 15:18, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.8°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:18:23,"Time: 15:18, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.8°",WARNING,Stay calm please,False,SCENIC
+2026-04-16 15:18:45,"Time: 15:18, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +2.3°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:18:55,"Time: 15:18, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.6°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:19:05,"Time: 15:19, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +8.8°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:19:15,"Time: 15:19, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:19:25,"Time: 15:19, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +1.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:19:35,"Time: 15:19, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.1°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:19:45,"Time: 15:19, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.5°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:19:55,"Time: 15:19, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.0°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:20:05,"Time: 15:20, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.8°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:20:26,"Time: 15:20, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:20:35,"Time: 15:20, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.4°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:20:45,"Time: 15:20, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.8°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:21:01,"Time: 15:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +8.1°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:21:11,"Time: 15:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.0°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:21:22,"Time: 15:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -2.1°",WARNING,Stay calm please,False,SCENIC
+2026-04-16 15:21:34,"Time: 15:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -0.9°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:21:44,"Time: 15:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.1°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:21:54,"Time: 15:21, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.5°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:22:04,"Time: 15:22, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +7.8°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:22:18,"Time: 15:22, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +3.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:22:28,"Time: 15:22, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +2.1°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:22:46,"Time: 15:22, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 55%, Distracted: False, Head yaw: -3.1°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:22:51,"Time: 15:22, Driver active for 45 min, Trigger: DROWSY, Emotion: Angry, Eye openness: 26%, Distracted: False, Head yaw: -4.7°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:22:56,"Time: 15:22, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 21%, Distracted: False, Head yaw: -7.1°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:22:59,"Time: 15:22, Driver active for 45 min, Trigger: DROWSY, Emotion: Angry, Eye openness: 33%, Distracted: False, Head yaw: -8.7°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:23:06,"Time: 15:23, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +5.0°",WARNING,Stay calm please,False,SCENIC
+2026-04-16 15:23:18,"Time: 15:23, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 21%, Distracted: False, Head yaw: -9.5°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:23:26,"Time: 15:23, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 56%, Distracted: False, Head yaw: -5.5°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:23:26,"Time: 15:23, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 32%, Distracted: False, Head yaw: -5.1°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:23:37,"Time: 15:23, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 66%, Distracted: False, Head yaw: -6.8°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:24:19,"Time: 15:24, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +3.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:24:29,"Time: 15:24, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +3.4°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:24:39,"Time: 15:24, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 56%, Distracted: False, Head yaw: +6.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:24:51,"Time: 15:24, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +5.7°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:25:01,"Time: 15:25, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +5.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:25:11,"Time: 15:25, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +4.9°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:25:26,"Time: 15:25, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 68%, Distracted: False, Head yaw: -3.9°",WARNING,Calm down,False,SCENIC
+2026-04-16 15:25:27,"Time: 15:25, Driver active for 45 min, Trigger: DROWSY, Emotion: Happy, Eye openness: 70%, Distracted: False, Head yaw: +1.3°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:25:39,"Time: 15:25, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 87%, Distracted: False, Head yaw: -11.5°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:25:46,"Time: 15:25, Driver active for 45 min, Trigger: DROWSY, Emotion: Angry, Eye openness: 28%, Distracted: False, Head yaw: -4.7°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:25:57,"Time: 15:25, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 30%, Distracted: False, Head yaw: -5.7°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:26:03,"Time: 15:26, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 24%, Distracted: False, Head yaw: -4.9°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:26:05,"Time: 15:26, Driver active for 45 min, Trigger: DROWSY, Emotion: Angry, Eye openness: 47%, Distracted: False, Head yaw: -5.3°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:26:13,"Time: 15:26, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 22%, Distracted: False, Head yaw: -8.9°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:26:23,"Time: 15:26, Driver active for 45 min, Trigger: DROWSY, Emotion: Happy, Eye openness: 28%, Distracted: False, Head yaw: -7.5°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:26:31,"Time: 15:26, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 73%, Distracted: False, Head yaw: -7.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:26:55,"Time: 15:26, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 69%, Distracted: False, Head yaw: -12.2°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:27:02,"Time: 15:27, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 26%, Distracted: False, Head yaw: -5.0°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:27:16,"Time: 15:27, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 63%, Distracted: False, Head yaw: -2.9°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:27:25,"Time: 15:27, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:27:32,"Time: 15:27, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 52%, Distracted: False, Head yaw: -4.0°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:27:44,"Time: 15:27, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 96%, Distracted: False, Head yaw: -25.2°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:28:00,"Time: 15:27, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 97%, Distracted: False, Head yaw: -9.9°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:28:09,"Time: 15:28, Driver active for 45 min, Trigger: DROWSY, Emotion: Angry, Eye openness: 48%, Distracted: False, Head yaw: +0.4°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:28:10,"Time: 15:28, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 69%, Distracted: False, Head yaw: -4.8°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:28:23,"Time: 15:28, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 64%, Distracted: False, Head yaw: -5.3°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:28:24,"Time: 15:28, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 14%, Distracted: False, Head yaw: -5.0°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:28:40,"Time: 15:28, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:28:50,"Time: 15:28, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +1.4°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:29:04,"Time: 15:29, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:29:14,"Time: 15:29, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +6.6°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:29:29,"Time: 15:29, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 40%, Distracted: False, Head yaw: +17.7°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:29:40,"Time: 15:29, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +8.5°",WARNING,Stay calm please,False,SCENIC
+2026-04-16 15:29:50,"Time: 15:29, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +1.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:30:00,"Time: 15:30, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -5.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:30:11,"Time: 15:30, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +9.9°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:30:20,"Time: 15:30, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +3.6°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:30:30,"Time: 15:30, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 61%, Distracted: False, Head yaw: -6.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:30:41,"Time: 15:30, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 83%, Distracted: False, Head yaw: +3.9°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:30:48,"Time: 15:30, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 50%, Distracted: False, Head yaw: -2.8°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:31:01,"Time: 15:31, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 28%, Distracted: False, Head yaw: -1.1°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:31:04,"Time: 15:31, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 32%, Distracted: False, Head yaw: -6.2°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:31:11,"Time: 15:31, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 81%, Distracted: False, Head yaw: -1.9°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:31:19,"Time: 15:31, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 43%, Distracted: False, Head yaw: +1.4°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:31:21,"Time: 15:31, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 74%, Distracted: False, Head yaw: -1.9°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:31:31,"Time: 15:31, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 76%, Distracted: False, Head yaw: -1.3°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:31:36,"Time: 15:31, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 64%, Distracted: False, Head yaw: -4.9°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:31:41,"Time: 15:31, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 75%, Distracted: False, Head yaw: +7.1°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:31:44,"Time: 15:31, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 47%, Distracted: False, Head yaw: +3.4°",DANGER,Wake Up Now,True,REST_STOP
+2026-04-16 15:31:53,"Time: 15:31, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 89%, Distracted: False, Head yaw: +5.5°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:32:03,"Time: 15:32, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:32:13,"Time: 15:32, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 93%, Distracted: False, Head yaw: +5.7°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:32:20,"Time: 15:32, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 50%, Distracted: False, Head yaw: -3.1°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:32:25,"Time: 15:32, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 49%, Distracted: False, Head yaw: -4.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:32:28,"Time: 15:32, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 24%, Distracted: False, Head yaw: -2.5°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:32:35,"Time: 15:32, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:32:41,"Time: 15:32, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 22%, Distracted: False, Head yaw: -2.3°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:32:53,"Time: 15:32, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 83%, Distracted: False, Head yaw: -14.7°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:33:27,"Time: 15:33, Driver active for 45 min, Trigger: DROWSY, Emotion: Neutral, Eye openness: 61%, Distracted: False, Head yaw: -9.8°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:33:30,"Time: 15:33, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 87%, Distracted: False, Head yaw: -11.8°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:33:42,"Time: 15:33, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 30%, Distracted: False, Head yaw: -16.4°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:33:52,"Time: 15:33, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 28%, Distracted: False, Head yaw: -4.8°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:34:02,"Time: 15:34, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 41%, Distracted: False, Head yaw: -3.5°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:34:12,"Time: 15:34, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 12%, Distracted: False, Head yaw: -1.9°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:34:12,"Time: 15:34, Driver active for 45 min, Trigger: DROWSY, Emotion: Stressed, Eye openness: 56%, Distracted: False, Head yaw: -1.9°",DANGER,Wake up now,True,REST_STOP
+2026-04-16 15:34:22,"Time: 15:34, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.8°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:34:32,"Time: 15:34, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 97%, Distracted: False, Head yaw: +0.4°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:34:42,"Time: 15:34, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +0.0°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:34:58,"Time: 15:34, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 12%, Distracted: False, Head yaw: -9.1°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:35:08,"Time: 15:35, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +13.2°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:35:18,"Time: 15:35, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +19.1°",WARNING,Stay calm,False,SCENIC
+2026-04-16 15:35:30,"Time: 15:35, Driver active for 45 min, Trigger: EMOTION, Emotion: Angry, Eye openness: 100%, Distracted: False, Head yaw: +4.6°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:35:40,"Time: 15:35, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +6.7°",WARNING,Calm down now,False,SCENIC
+2026-04-16 15:35:50,"Time: 15:35, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 95%, Distracted: False, Head yaw: +13.7°",WARNING,Stay calm now,False,SCENIC
+2026-04-16 15:36:00,"Time: 15:36, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: +1.9°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:36:10,"Time: 15:36, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 100%, Distracted: False, Head yaw: -1.6°",WARNING,Stay calm driver,False,SCENIC
+2026-04-16 15:36:20,"Time: 15:36, Driver active for 45 min, Trigger: EMOTION, Emotion: Stressed, Eye openness: 78%, Distracted: True, Head yaw: +33.4°",WARNING,Stay calm,False,SCENIC
