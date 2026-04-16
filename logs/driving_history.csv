@@ -43,3 +43,36 @@ timestamp,input,level,message,buzzer
 2026-04-10 14:36:58,"Eye openness: 5%, Yawning: YES, Duration: 3s",DANGER,"Driver sleepy, take a break now",True,REST_STOP
 2026-04-10 14:37:10,"Eye openness: 85%, Emotion: High Anger, Gaze: Road",WARNING,"Angry, avoid distraction",False,SCENIC
 2026-04-10 14:37:14,"Eye openness: 90%, Emotion: Happy, Gaze: Road",INFO,"Driving well, focus on the road",False,FASTEST
+2026-04-15 18:11:18,"Eye openness: 100%, Drowsy: False, Emotion: Stressed, Confidence: 98.3%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:11:26,"Eye openness: 100%, Drowsy: False, Emotion: Stressed, Confidence: 44.7%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:11:35,"Eye openness: 78%, Drowsy: False, Emotion: Stressed, Confidence: 75.9%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:11:43,"Eye openness: 100%, Drowsy: False, Emotion: Neutral, Confidence: 49.4%",INFO,Drive safely,False,FASTEST
+2026-04-15 18:11:52,"Eye openness: 100%, Drowsy: False, Emotion: Stressed, Confidence: 99.4%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:12:03,"Eye openness: 77%, Drowsy: False, Emotion: Stressed, Confidence: 58.3%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:12:28,"Eye openness: 99%, Drowsy: False, Emotion: Stressed, Confidence: 57.8%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:12:38,"Eye openness: 45%, Drowsy: True, Emotion: Neutral, Confidence: 96.5%",DANGER,Wake up now,True,REST_STOP
+2026-04-15 18:12:46,"Eye openness: 80%, Drowsy: False, Emotion: Stressed, Confidence: 95.5%",WARNING,Stay calm,False,SCENIC
+2026-04-15 18:13:05,"Eye openness: 37%, Drowsy: True, Emotion: Neutral, Confidence: 56.3%",DANGER,Wake up now,True,REST_STOP
+2026-04-15 18:13:13,"Eye openness: 100%, Drowsy: False, Emotion: Stressed, Confidence: 43.8%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:13:28,"Eye openness: 89%, Drowsy: False, Emotion: Stressed, Confidence: 72.7%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:14:04,"Eye openness: 100%, Drowsy: False, Emotion: Stressed, Confidence: 95.4%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:14:36,"Eye openness: 80%, Drowsy: False, Emotion: Stressed, Confidence: 100.0%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:18:20,"Eye openness: 42%, Drowsy: False, Emotion: Stressed, Confidence: 63.4%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:18:31,"Eye openness: 98%, Drowsy: False, Emotion: Stressed, Confidence: 97.7%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:18:42,"Eye openness: 50%, Drowsy: True, Emotion: Happy, Confidence: 99.0%",DANGER,Wake up now,True,REST_STOP
+2026-04-15 18:18:56,"Eye openness: 100%, Drowsy: False, Emotion: Stressed, Confidence: 50.2%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:19:04,"Eye openness: 99%, Drowsy: False, Emotion: Stressed, Confidence: 61.4%",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:33:02,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-15 18:33:14,"Eye openness: 90%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm please,False,SCENIC
+2026-04-15 18:33:26,"Eye openness: 97%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-15 18:33:34,"Eye openness: 54%, Drowsy: True, Emotion: Stressed",DANGER,Wake up now,True,REST_STOP
+2026-04-15 18:33:51,"Eye openness: 26%, Drowsy: True, Emotion: Neutral",DANGER,Wake up now,True,REST_STOP
+2026-04-16 12:12:56,"Eye openness: 32%, Drowsy: True, Emotion: Neutral",DANGER,Wake up now,True,REST_STOP
+2026-04-16 12:13:05,"Eye openness: 72%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-16 12:13:25,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-16 12:13:33,"Eye openness: 73%, Drowsy: False, Emotion: Angry",WARNING,Stay calm now,False,SCENIC
+2026-04-16 12:13:41,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-16 12:13:49,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-16 12:13:57,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-16 12:14:05,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC
+2026-04-16 12:14:13,"Eye openness: 100%, Drowsy: False, Emotion: Stressed",WARNING,Stay calm,False,SCENIC

@@ -1,23 +1,46 @@
 import pyttsx3
+import threading
 
 class AdamsVoice:
     def __init__(self):
-        self.engine = pyttsx3.init()
-        # Adjusting voice properties
-        self.engine.setProperty('rate', 160)    # Speed of speech
-        self.engine.setProperty('volume', 1.0)  # Volume (0.0 to 1.0)
-        
-        # Optional: Select a different voice (0 for Male, 1 for Female usually)
-        voices = self.engine.getProperty('voices')
-        if len(voices) > 1:
-            self.engine.setProperty('voice', voices[1].id)
+        self.is_speaking = False
+        self.lock = threading.Lock()
+        self.rate = 160
+        self.volume = 1.0
+
+    def _speak_worker(self, text):
+        """Internal worker to handle the voice engine safely."""
+        with self.lock:
+            self.is_speaking = True
+            try:
+                # Initialize inside the thread for stability
+                engine = pyttsx3.init()
+                engine.setProperty('rate', self.rate)
+                engine.setProperty('volume', self.volume)
+                
+                voices = engine.getProperty('voices')
+                if len(voices) > 1:
+                    engine.setProperty('voice', voices[1].id)
+
+                engine.say(text)
+                engine.runAndWait()
+                engine.stop() 
+            except Exception as e:
+                print(f"❌ Voice Error: {e}")
+            finally:
+                self.is_speaking = False
+
+    def speak(self, text):
+        """NON-BLOCKING: The camera will keep moving while ADAMS talks."""
+        if not self.is_speaking:
+            print(f"🗣️  ADAMS Speaking: {text}")
+            threading.Thread(target=self._speak_worker, args=(text,), daemon=True).start()
 
     def say(self, text):
-        print(f"🗣️  ADAMS Speaking: {text}")
-        self.engine.say(text)
-        self.engine.runAndWait()
-
-# Quick standalone test
-if __name__ == "__main__":
-    v = AdamsVoice()
-    v.say("ADAMS Safety System Online. Drive safely.")
+        """BLOCKING: Use this only for startup messages."""
+        try:
+            temp_engine = pyttsx3.init()
+            temp_engine.say(text)
+            temp_engine.runAndWait()
+        except:
+            pass
