@@ -18,10 +18,7 @@ class AdamsLiveApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0B1220),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.dark,
-        ),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       home: const LiveShell(),
@@ -60,6 +57,38 @@ class _LiveShellState extends State<LiveShell> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF111827),
         title: const Text('ADAMS Live Monitor'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(54),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: ValueListenableBuilder<String>(
+              valueListenable: _api.liveSpeech,
+              builder: (_, speech, __) => Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.graphic_eq, color: Colors.lightBlueAccent),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        speech,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -103,16 +132,10 @@ class _LiveShellState extends State<LiveShell> {
         title: const Text('Backend URL'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'http://192.168.0.10:8000',
-            labelText: 'Base URL',
-          ),
+          decoration: const InputDecoration(hintText: 'http://127.0.0.1:8000', labelText: 'Base URL'),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           FilledButton(
             onPressed: () {
               _api.updateBaseUrl(controller.text.trim());
@@ -135,9 +158,7 @@ class DashboardScreen extends StatelessWidget {
     return ValueListenableBuilder<DriverState?>(
       valueListenable: api.currentState,
       builder: (_, state, __) {
-        if (state == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        if (state == null) return const Center(child: CircularProgressIndicator());
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -152,7 +173,7 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 InfoTile.card(title: 'Risk Level', value: state.level, icon: Icons.shield, color: state.levelColor),
                 InfoTile.card(title: 'Driver State', value: state.driverState, icon: Icons.person, color: state.levelColor),
-                InfoTile.card(title: 'Message', value: state.message, icon: Icons.message, color: Colors.lightBlueAccent),
+                InfoTile.card(title: 'AI Speech', value: state.spokenText, icon: Icons.record_voice_over, color: Colors.lightBlueAccent),
                 InfoTile.card(title: 'Buzzer', value: state.buzzer ? 'ON' : 'OFF', icon: Icons.notifications_active, color: state.buzzer ? Colors.orangeAccent : Colors.greenAccent),
               ],
             ),
@@ -169,6 +190,8 @@ class DashboardScreen extends StatelessWidget {
                     _Row(label: 'Backend URL', value: api.baseUrl.value),
                     _Row(label: 'Timestamp', value: state.timestamp),
                     _Row(label: 'Raw input', value: state.input),
+                    _Row(label: 'Message', value: state.message),
+                    _Row(label: 'Action', value: state.recommendedAction),
                     _Row(label: 'Source file', value: state.sourcePath),
                   ],
                 ),
@@ -190,37 +213,36 @@ class MonitoringScreen extends StatelessWidget {
     return ValueListenableBuilder<DriverState?>(
       valueListenable: api.currentState,
       builder: (_, state, __) {
-        if (state == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        if (state == null) return const Center(child: CircularProgressIndicator());
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Container(
-              height: 240,
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: const Color(0xFF111827),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.blueAccent.withOpacity(0.3)),
+                border: Border.all(color: state.levelColor.withOpacity(0.35)),
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(state.buzzer ? Icons.warning_amber_rounded : Icons.videocam, size: 72, color: state.levelColor),
                   const SizedBox(height: 12),
-                  Text(state.driverState, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  Text(state.message, textAlign: TextAlign.center),
-                  const SizedBox(height: 12),
-                  StatusChip(label: 'Polling every 1 second', color: Colors.lightBlueAccent),
+                  Text(state.spokenText, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: state.levelColor), textAlign: TextAlign.center),
+                  const SizedBox(height: 10),
+                  Text(state.message, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(height: 10),
+                  Text(state.recommendedAction, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 14),
+                  StatusChip(label: 'Live refresh every 1 second', color: Colors.lightBlueAccent),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             InfoTile.list(title: 'Current level', subtitle: state.level, icon: Icons.flag, color: state.levelColor),
-            InfoTile.list(title: 'Alert action', subtitle: state.buzzer ? 'Alarm should trigger on desktop side' : 'No alarm needed', icon: Icons.volume_up, color: state.buzzer ? Colors.orangeAccent : Colors.greenAccent),
+            InfoTile.list(title: 'Alert action', subtitle: state.buzzer ? 'Desktop alarm should be active' : 'No alarm needed', icon: Icons.volume_up, color: state.buzzer ? Colors.orangeAccent : Colors.greenAccent),
             InfoTile.list(title: 'Camera interpretation', subtitle: state.input, icon: Icons.center_focus_strong, color: Colors.lightBlueAccent),
-            InfoTile.list(title: 'System note', subtitle: 'This app listens to the backend, not directly to the camera.', icon: Icons.info_outline, color: Colors.purpleAccent),
+            InfoTile.list(title: 'AI spoken output', subtitle: state.spokenText, icon: Icons.campaign, color: Colors.purpleAccent),
           ],
         );
       },
@@ -237,14 +259,27 @@ class AlertsScreen extends StatelessWidget {
     return ValueListenableBuilder<List<AlertItem>>(
       valueListenable: api.alerts,
       builder: (_, alerts, __) {
-        if (alerts.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return ListView.separated(
+        if (alerts.isEmpty) return const Center(child: CircularProgressIndicator());
+        return ListView(
           padding: const EdgeInsets.all(16),
-          itemCount: alerts.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (_, index) => AlertCard(item: alerts[index]),
+          children: [
+            ValueListenableBuilder<String>(
+              valueListenable: api.liveSpeech,
+              builder: (_, speech, __) => Card(
+                color: const Color(0xFF111827),
+                child: ListTile(
+                  leading: const Icon(Icons.multitrack_audio, color: Colors.lightBlueAccent),
+                  title: const Text('Latest AI speech'),
+                  subtitle: Text(speech),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...alerts.map((item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: AlertCard(item: item),
+            )),
+          ],
         );
       },
     );
@@ -260,9 +295,7 @@ class HistoryScreen extends StatelessWidget {
     return ValueListenableBuilder<List<AlertItem>>(
       valueListenable: api.alerts,
       builder: (_, alerts, __) {
-        if (alerts.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        if (alerts.isEmpty) return const Center(child: CircularProgressIndicator());
         return ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: alerts.length,
@@ -272,8 +305,8 @@ class HistoryScreen extends StatelessWidget {
               color: const Color(0xFF111827),
               child: ListTile(
                 leading: CircleAvatar(backgroundColor: item.color.withOpacity(0.15), child: Icon(Icons.history, color: item.color)),
-                title: Text(item.message),
-                subtitle: Text('${item.timestamp} • ${item.input}'),
+                title: Text(item.spokenText),
+                subtitle: Text('${item.timestamp} • ${item.message}'),
                 trailing: Text(item.level, style: TextStyle(color: item.color, fontWeight: FontWeight.bold)),
               ),
             );
@@ -293,9 +326,7 @@ class SchemaScreen extends StatelessWidget {
     return ValueListenableBuilder<Map<String, dynamic>?>(
       valueListenable: api.schema,
       builder: (_, schema, __) {
-        if (schema == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        if (schema == null) return const Center(child: CircularProgressIndicator());
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
@@ -333,6 +364,8 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(state.driverState, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
+          Text(state.spokenText, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 6),
           Text(state.message),
           const SizedBox(height: 12),
           Wrap(

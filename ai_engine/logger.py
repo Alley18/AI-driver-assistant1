@@ -2,29 +2,21 @@
 ADAMS Event Logger
 ==================
 Persists driver-state events and the corresponding AI safety responses to a
-rolling CSV log file.  Each row captures a full decision cycle: the raw
-telemetry that triggered the AI, and the structured JSON advice it returned.
+rolling CSV log file.
 
 Authors : ADAMS Team
-Version : 2.0.0
+Version : 2.1.0
 """
 
 import csv
 import json
 import logging
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-# ---------------------------------------------------------------------------
-# Module logger
-# ---------------------------------------------------------------------------
 logger = logging.getLogger("adams.logger")
 
-# ---------------------------------------------------------------------------
-# Configuration
-# ---------------------------------------------------------------------------
 LOG_DIR: Path = Path("logs")
 LOG_FILE: Path = LOG_DIR / "driving_history.csv"
 
@@ -33,49 +25,89 @@ _CSV_FIELDNAMES: tuple[str, ...] = (
     "input",
     "level",
     "message",
-    "buzzer_active",
+    "spoken_text",
+    "buzzer",
+    "driver_state",
+    "trigger",
     "suggested_route",
 )
 
 
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
 def log_event(detection: str, ai_response_json: str) -> bool:
     """
-    Append a single driver-state event to the CSV log.
+    Append a single event row to the CSV log.
 
-    The function is intentionally fault-tolerant: it logs a warning on any
-    error rather than raising, so a logging failure never crashes the pipeline.
+    detection:
+        Can be either:
+        - plain telemetry string
+        - JSON string containing structured live alert data
 
-    Parameters
-    ----------
-    detection : str
-        The raw telemetry string that was sent to the AI brain
-        (e.g. ``"Time: 14:30, Emotion: Stressed, Eye openness: 35%"``).
-    ai_response_json : str
-        The JSON string returned by :class:`~ai_engine.brain.AdamsBrain`.
-        Expected keys: ``level``, ``message``, ``buzzer_active``,
-        ``suggested_route``.
-
-    Returns
-    -------
-    bool
-        ``True`` if the row was written successfully, ``False`` otherwise.
+    ai_response_json:
+        Can be either:
+        - JSON from AdamsBrain
+        - lightweight JSON for instant voice alerts
     """
     try:
-        data = _parse_ai_response(ai_response_json)
-        if data is None:
-            return False
+        detection_data = _parse_json_if_possible(detection)
+        ai_data = _parse_json_if_possible(ai_response_json)
 
         row = {
-            "timestamp":       datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "input":           detection.strip(),
-            "level":           data.get("level", "UNKNOWN"),
-            "message":         data.get("message", ""),
-            "buzzer_active":   data.get("buzzer_active", False),
-            "suggested_route": data.get("suggested_route", "N/A"),
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "input": "",
+            "level": "INFO",
+            "message": "",
+            "spoken_text": "",
+            "buzzer": False,
+            "driver_state": "Monitoring",
+            "trigger": "",
+            "suggested_route": "N/A",
         }
+
+        # Detection side
+        if isinstance(detection_data, dict):
+            row["timestamp"] = str(detection_data.get("timestamp", row["timestamp"]))
+            row["input"] = str(detection_data.get("input", ""))
+            row["level"] = str(detection_data.get("level", row["level"]))
+            row["message"] = str(detection_data.get("message", ""))
+            row["spoken_text"] = str(
+                detection_data.get("spoken_text")
+                or detection_data.get("message")
+                or ""
+            )
+            row["buzzer"] = _to_bool(detection_data.get("buzzer", False))
+            row["driver_state"] = str(
+                detection_data.get("driver_state")
+                or detection_data.get("trigger")
+                or row["driver_state"]
+            )
+            row["trigger"] = str(detection_data.get("trigger", ""))
+        else:
+            row["input"] = str(detection).strip()
+
+        # AI response side
+        if isinstance(ai_data, dict):
+            row["level"] = str(ai_data.get("level", row["level"]))
+            row["message"] = str(ai_data.get("message", row["message"]))
+            row["spoken_text"] = str(
+                ai_data.get("spoken_text")
+                or ai_data.get("message")
+                or row["spoken_text"]
+            )
+            row["buzzer"] = _to_bool(
+                ai_data.get("buzzer", ai_data.get("buzzer_active", row["buzzer"]))
+            )
+            row["suggested_route"] = str(
+                ai_data.get("suggested_route", row["suggested_route"])
+            )
+            row["driver_state"] = str(
+                ai_data.get("driver_state", row["driver_state"])
+            )
+
+        if not row["message"] and row["spoken_text"]:
+            row["message"] = row["spoken_text"]
+
+        if not row["spoken_text"] and row["message"]:
+            row["spoken_text"] = row["message"]
 
         _ensure_log_dir()
         _write_row(row)
@@ -89,51 +121,35 @@ def log_event(detection: str, ai_response_json: str) -> bool:
 
 
 def read_recent_events(n: int = 50) -> list[dict]:
-    """
-    Return the *n* most-recent log rows as a list of dicts.
-
-    Parameters
-    ----------
-    n : int
-        Maximum number of rows to return (most recent first).
-
-    Returns
-    -------
-    list[dict]
-        Each element has the same keys as ``_CSV_FIELDNAMES``.
-        Returns an empty list if the log file does not yet exist.
-    """
     if not LOG_FILE.exists():
         return []
 
     try:
         with LOG_FILE.open(newline="", encoding="utf-8") as fh:
             rows = list(csv.DictReader(fh))
-        return rows[-n:][::-1]  # most-recent first
+        return rows[-n:][::-1]
     except Exception:
         logger.exception("Failed to read log file")
         return []
 
 
-# ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
-def _parse_ai_response(raw_json: str) -> Optional[dict]:
-    """Safely deserialise the AI response JSON string."""
+def _parse_json_if_possible(raw: str) -> Optional[dict]:
     try:
-        return json.loads(raw_json)
-    except json.JSONDecodeError:
-        logger.warning("log_event received invalid JSON — skipping row.\n  Raw: %r", raw_json[:200])
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, dict) else None
+    except Exception:
         return None
 
 
+def _to_bool(value) -> bool:
+    return str(value).strip().lower() in ("true", "1", "yes")
+
+
 def _ensure_log_dir() -> None:
-    """Create the log directory if it does not already exist."""
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def _write_row(row: dict) -> None:
-    """Append *row* to the CSV log, writing a header if the file is new."""
     file_is_new = not LOG_FILE.exists() or LOG_FILE.stat().st_size == 0
 
     with LOG_FILE.open("a", newline="", encoding="utf-8") as fh:
@@ -143,22 +159,27 @@ def _write_row(row: dict) -> None:
         writer.writerow(row)
 
 
-# ---------------------------------------------------------------------------
-# Smoke test
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
-    sample_detection = "Time: 14:30, Emotion: Stressed, Eye openness: 35%"
+    sample_detection = json.dumps({
+        "timestamp": "2026-04-16 20:10:00",
+        "trigger": "VOICE_DROWSY",
+        "input": "Eyes closed detected",
+        "level": "WARNING",
+        "message": "Wake up!",
+        "spoken_text": "Wake up!",
+        "buzzer": True,
+        "driver_state": "Drowsy",
+    })
+
     sample_response = json.dumps({
         "level": "WARNING",
         "message": "Please pull over and rest.",
-        "buzzer_active": False,
+        "buzzer": True,
         "suggested_route": "SCENIC",
     })
 
     success = log_event(sample_detection, sample_response)
     print("Logged:", success)
-
-    recent = read_recent_events(5)
-    print("Recent events:", recent)
+    print(read_recent_events(5))
