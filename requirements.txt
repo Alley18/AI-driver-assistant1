@@ -38,3 +38,11 @@ typing_extensions==4.15.0
 uritemplate==4.2.0
 urllib3==2.6.3
 websockets==16.0
+opencv-python      # cv2
+deepface           # DeepFace
+mediapipe          # face_mesh.py
+numpy              # face_mesh.py
+groq               # brain.py
+python-dotenv      # brain.py
+pyttsx3            # voice_engine.py
+tf-keras
