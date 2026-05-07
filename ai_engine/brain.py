@@ -3,10 +3,11 @@ ADAMS Brain
 ===========
 AI safety controller for the Advanced Driver Alertness Monitoring System.
 Uses the Groq API (LLaMA 3.3-70B) to generate structured JSON safety
-instructions from driver telemetry.
+instructions from driver telemetry AND power a full conversational
+driving assistant.
 
 Authors : ADAMS Team
-Version : 2.0.0
+Version : 3.0.0
 """
 
 import os
@@ -39,12 +40,12 @@ for _candidate in (
 # Type aliases
 # ---------------------------------------------------------------------------
 AlertLevel = Literal["INFO", "WARNING", "DANGER", "ERROR"]
-RouteType = Literal["FASTEST", "SCENIC", "REST_STOP"]
+RouteType  = Literal["FASTEST", "SCENIC", "REST_STOP"]
 
 # ---------------------------------------------------------------------------
-# System prompt — defined at module level so it is easy to audit / version
+# System prompt — structured safety alert (unchanged from v2)
 # ---------------------------------------------------------------------------
-_SYSTEM_PROMPT = """
+_SAFETY_SYSTEM_PROMPT = """
 You are the ADAMS Safety Controller (Advanced Driver Alertness Monitoring System).
 
 Analyse the driver telemetry and return a JSON safety instruction following
@@ -63,6 +64,38 @@ Return ONLY valid JSON with exactly these four keys:
   "suggested_route" – one of FASTEST | SCENIC | REST_STOP      (string)
 """.strip()
 
+# ---------------------------------------------------------------------------
+# Conversational assistant system prompt — v3 addition
+# ---------------------------------------------------------------------------
+_ASSISTANT_SYSTEM_PROMPT = """
+You are ADAMS, an intelligent in-car AI driving assistant — like a calm,
+knowledgeable co-pilot sitting in the passenger seat.
+
+Your personality:
+- Warm, clear, and concise. Never robotic.
+- Proactive about safety but never preachy.
+- You speak like a trusted friend who happens to know everything about
+  driving, navigation, vehicle health, and road conditions.
+
+Your capabilities:
+- Answer questions about the current route, ETA, traffic, or nearby places.
+- Give driving tips, safety reminders, and wellness nudges.
+- Help with vehicle-related questions (tyre pressure, fuel economy, etc.).
+- Play music, set reminders, send messages — describe what you would do.
+- Make small talk to keep drowsy drivers engaged if needed.
+- Respond to emergencies calmly and with clear action steps.
+
+Current driver context will be injected into each message so you can
+personalise your responses (e.g. if they are drowsy, steer the conversation
+toward taking a break; if they are happy and calm, be lighter in tone).
+
+Rules:
+- Keep spoken responses short: 1-3 sentences unless the driver asks for detail.
+- Never read out URLs or complex data — summarise in plain English.
+- If the driver sounds confused or stressed, simplify your language.
+- Always prioritise safety over any other task.
+""".strip()
+
 _REQUIRED_KEYS: frozenset[str] = frozenset(
     {"level", "message", "buzzer_active", "suggested_route"}
 )
@@ -73,8 +106,16 @@ _REQUIRED_KEYS: frozenset[str] = frozenset(
 # ---------------------------------------------------------------------------
 class AdamsBrain:
     """
-    Interfaces with the Groq API to translate raw driver telemetry into
-    actionable, structured safety advice.
+    Dual-mode AI brain for ADAMS:
+
+    1. **Safety mode** (``generate_advice``):
+       Translates raw driver telemetry into structured JSON safety alerts —
+       unchanged from v2.
+
+    2. **Assistant mode** (``chat``):
+       Full conversational driving assistant with persistent memory.
+       Maintains a rolling conversation history so the driver can ask
+       follow-up questions naturally.
 
     Parameters
     ----------
@@ -84,6 +125,9 @@ class AdamsBrain:
         Sampling temperature (lower = more deterministic / consistent).
     max_tokens : int
         Upper bound on completion length.
+    max_history_turns : int
+        How many conversation turns to keep in memory (older turns are
+        dropped to stay within the model's context window).
     """
 
     def __init__(
@@ -91,6 +135,7 @@ class AdamsBrain:
         model: str = "llama-3.3-70b-versatile",
         temperature: float = 0.3,
         max_tokens: int = 150,
+        max_history_turns: int = 10,
     ) -> None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
@@ -99,14 +144,49 @@ class AdamsBrain:
                 "Add it to your .env file in the project root."
             )
 
-        self.client = Groq(api_key=api_key)
-        self.model = model
-        self.temperature = temperature
-        self.max_tokens = max_tokens
-        logger.info("AdamsBrain ready (model=%s).", self.model)
+        self.client            = Groq(api_key=api_key)
+        self.model             = model
+        self.temperature       = temperature
+        self.max_tokens        = max_tokens
+        self.max_history_turns = max_history_turns
+
+        # Conversation history for the assistant (list of role/content dicts)
+        self._history: list[dict] = []
+
+        # Latest driver context — injected automatically into every chat turn
+        self._driver_context: str = "Driver state unknown."
+
+        logger.info("AdamsBrain v3 ready (model=%s).", self.model)
 
     # ------------------------------------------------------------------
-    # Public API
+    # Context management
+    # ------------------------------------------------------------------
+
+    def update_driver_context(self, state: str | dict) -> None:
+        """
+        Update the stored driver telemetry context.
+
+        Call this every time new telemetry arrives so that the
+        conversational assistant always has up-to-date context when
+        the driver speaks.
+
+        Parameters
+        ----------
+        state : str or dict
+            Latest driver telemetry snapshot.
+        """
+        if isinstance(state, dict):
+            state = json.dumps(state)
+        self._driver_context = state
+        logger.debug("Driver context updated: %s", state[:80])
+
+    def clear_history(self) -> None:
+        """Wipe the conversation history (e.g. at the start of a new trip)."""
+        self._history = []
+        logger.info("Conversation history cleared.")
+
+    # ------------------------------------------------------------------
+    # Safety mode (v2 — unchanged)
     # ------------------------------------------------------------------
 
     def generate_advice(self, driver_state: str | dict) -> str:
@@ -133,11 +213,14 @@ class AdamsBrain:
         if len(driver_state.strip()) < 3:
             return self._default_response("INFO", "Scanning environment.", False, "FASTEST")
 
+        # Keep driver context in sync automatically
+        self.update_driver_context(driver_state)
+
         try:
             completion = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "system", "content": _SAFETY_SYSTEM_PROMPT},
                     {"role": "user",   "content": f"Driver Telemetry: {driver_state}"},
                 ],
                 response_format={"type": "json_object"},
@@ -149,8 +232,76 @@ class AdamsBrain:
             return self._validate_response(raw)
 
         except Exception:
-            logger.exception("Groq API call failed")
+            logger.exception("Groq API call failed (safety mode)")
             return self._default_response("ERROR", "Safety AI offline.", False, "FASTEST")
+
+    # ------------------------------------------------------------------
+    # Assistant mode (v3 — new)
+    # ------------------------------------------------------------------
+
+    def chat(self, driver_utterance: str) -> str:
+        """
+        Have a natural conversation with the driver.
+
+        The latest driver telemetry context (set via ``update_driver_context``
+        or automatically by ``generate_advice``) is injected into every turn
+        so the assistant can tailor its responses to the driver's current state.
+
+        Parameters
+        ----------
+        driver_utterance : str
+            What the driver said (transcribed speech from AdamsEars).
+
+        Returns
+        -------
+        str
+            The assistant's spoken response (plain text, ready for AdamsVoice).
+        """
+        if not driver_utterance or not driver_utterance.strip():
+            return "I didn't catch that — could you say it again?"
+
+        # Build a context-enriched user message
+        enriched_message = (
+            f"[Driver telemetry: {self._driver_context}]\n"
+            f"Driver says: {driver_utterance}"
+        )
+
+        # Append the new user turn to history
+        self._history.append({"role": "user", "content": enriched_message})
+
+        # Trim history to avoid context overflow
+        # Keep the most recent N *pairs* of turns (user + assistant)
+        max_messages = self.max_history_turns * 2
+        if len(self._history) > max_messages:
+            self._history = self._history[-max_messages:]
+
+        try:
+            completion = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": _ASSISTANT_SYSTEM_PROMPT},
+                    *self._history,
+                ],
+                temperature=self.temperature,
+                max_tokens=300,   # Allow longer conversational replies
+            )
+
+            reply: str = completion.choices[0].message.content.strip()
+
+            # Store the assistant turn so follow-ups have context
+            self._history.append({"role": "assistant", "content": reply})
+
+            return reply
+
+        except Exception:
+            logger.exception("Groq API call failed (assistant mode)")
+            fallback = "I'm having trouble connecting. Please keep your eyes on the road."
+            self._history.append({"role": "assistant", "content": fallback})
+            return fallback
+
+    # ------------------------------------------------------------------
+    # Notification filter (v2 — unchanged)
+    # ------------------------------------------------------------------
 
     def filter_notification(self, driver_level: AlertLevel, notification_text: str) -> str:
         """
@@ -220,14 +371,15 @@ class AdamsBrain:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     brain = AdamsBrain()
-    print("🧠 ADAMS Brain — smoke test\n" + "-" * 60)
+    print("🧠 ADAMS Brain v3 — smoke test\n" + "=" * 60)
 
+    # ── Safety mode tests (v2 unchanged) ────────────────────────────────
+    print("\n[SAFETY MODE]\n" + "-" * 60)
     test_cases = [
         "Eye openness: 5%, Drowsy: True, Emotion: Tired, Confidence: 92%",
         "Eye openness: 85%, Drowsy: False, Emotion: Angry, Confidence: 78%",
         "Eye openness: 95%, Drowsy: False, Emotion: Happy, Confidence: 88%",
     ]
-
     for case in test_cases:
         response = brain.generate_advice(case)
         data = json.loads(response)
@@ -237,3 +389,18 @@ if __name__ == "__main__":
             f"Buzzer: {data['buzzer_active']} | Route: {data['suggested_route']}\n"
             + "-" * 60
         )
+
+    # ── Assistant mode tests (v3 new) ───────────────────────────────────
+    print("\n[ASSISTANT MODE]\n" + "-" * 60)
+
+    # Simulate a drowsy driver asking for help
+    brain.update_driver_context("Eye openness: 10%, Drowsy: True, Emotion: Tired")
+    questions = [
+        "How far is the next rest stop?",
+        "Can you play something to keep me awake?",
+        "What was that song you just played?",  # follow-up — tests memory
+    ]
+    for q in questions:
+        answer = brain.chat(q)
+        print(f"DRIVER : {q}")
+        print(f"ADAMS  : {answer}\n" + "-" * 60)

@@ -683,3 +683,7 @@ timestamp,input,level,message,buzzer
 2026-04-17 15:19:04,,WARNING,"Driver! you are distracted, please focus on the road!","Driver! you are distracted, please focus on the road!",True,VOICE_DISTRACTED,VOICE_DISTRACTED,N/A
 2026-04-17 15:19:08,,WARNING,"Driver! you are distracted, please focus on the road!","Driver! you are distracted, please focus on the road!",True,VOICE_DISTRACTED,VOICE_DISTRACTED,N/A
 2026-04-17 15:19:08,,WARNING,Stay focused,Stay focused,False,DISTRACTED,DISTRACTED,SCENIC
+2026-05-07 21:24:40,,DANGER,Wake up now,Wake up now,True,DROWSY,DROWSY,REST_STOP
+8d6decb8,2026-05-07 21:26:58,,DANGER,Wake up now,Wake up now,True,DROWSY,DROWSY,REST_STOP
+a8bd2069,2026-05-08 07:38:50,,DANGER,Wake up now,Wake up now,True,DROWSY,DROWSY,REST_STOP
+a8bd2069,2026-05-08 07:39:13,,DANGER,Wake Up Now,Wake Up Now,True,DROWSY,DROWSY,REST_STOP
