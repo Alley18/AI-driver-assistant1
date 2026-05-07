@@ -6,12 +6,13 @@ Uses the Groq API (LLaMA 3.3-70B) to generate structured JSON safety
 instructions from driver telemetry.
 
 Authors : ADAMS Team
-Version : 2.0.0
+Version : 3.0.0
 """
 
 import os
 import json
 import logging
+import time
 from typing import Literal
 
 from groq import Groq
@@ -38,34 +39,51 @@ for _candidate in (
 # ---------------------------------------------------------------------------
 # Type aliases
 # ---------------------------------------------------------------------------
-AlertLevel = Literal["INFO", "WARNING", "DANGER", "ERROR"]
-RouteType = Literal["FASTEST", "SCENIC", "REST_STOP"]
+AlertLevel  = Literal["INFO", "WARNING", "DANGER", "ERROR"]
+RouteType   = Literal["FASTEST", "SCENIC", "REST_STOP"]
 
 # ---------------------------------------------------------------------------
-# System prompt — defined at module level so it is easy to audit / version
+# System prompt
 # ---------------------------------------------------------------------------
 _SYSTEM_PROMPT = """
 You are the ADAMS Safety Controller (Advanced Driver Alertness Monitoring System).
 
-Analyse the driver telemetry and return a JSON safety instruction following
-these rules exactly:
+Your sole job is to protect the driver's life. Analyse the incoming driver
+telemetry and return a single JSON safety instruction following these rules:
 
-| Driver state                              | level    | buzzer | route      |
-|-------------------------------------------|----------|--------|------------|
-| Sleepy / drowsy / eyes closed             | DANGER   | true   | REST_STOP  |
-| Angry / stressed / fearful / distracted   | WARNING  | false  | SCENIC     |
-| Neutral / happy / calm                    | INFO     | false  | FASTEST    |
+DRIVER STATE → RESPONSE TABLE
+| Condition                                        | level   | buzzer | route      |
+|--------------------------------------------------|---------|--------|------------|
+| Drowsy / eyes closed / eye openness < 20 %      | DANGER  | true   | REST_STOP  |
+| Angry / stressed / fearful / severely distracted | WARNING | false  | SCENIC     |
+| Mildly distracted (head yaw only)                | WARNING | false  | FASTEST    |
+| Neutral / happy / calm / fully alert             | INFO    | false  | FASTEST    |
 
-Return ONLY valid JSON with exactly these four keys:
-  "level"           – one of INFO | WARNING | DANGER | ERROR  (string)
-  "message"         – a natural spoken alert, maximum 8 words  (string)
-  "buzzer_active"   – whether to activate the buzzer           (boolean)
-  "suggested_route" – one of FASTEST | SCENIC | REST_STOP      (string)
+TONE RULES
+- Messages must be calm, direct, and reassuring — never panic-inducing.
+- Use second person ("You seem…", "Please…", "Time to…").
+- Maximum 10 words per message. No punctuation except commas.
+- Examples:
+    DANGER  → "Pull over safely, you need rest now"
+    WARNING → "Take a breath, stay focused on the road"
+    INFO    → "All good, drive safe"
+
+Return ONLY valid JSON — no markdown, no explanation — with exactly these keys:
+  "level"           – one of INFO | WARNING | DANGER | ERROR   (string)
+  "message"         – spoken alert, ≤ 10 words                  (string)
+  "buzzer_active"   – true only for DANGER states               (boolean)
+  "suggested_route" – one of FASTEST | SCENIC | REST_STOP       (string)
 """.strip()
 
 _REQUIRED_KEYS: frozenset[str] = frozenset(
     {"level", "message", "buzzer_active", "suggested_route"}
 )
+
+# ---------------------------------------------------------------------------
+# Retry config
+# ---------------------------------------------------------------------------
+_MAX_RETRIES: int   = 2
+_RETRY_DELAY: float = 1.5   # seconds
 
 
 # ---------------------------------------------------------------------------
@@ -79,7 +97,7 @@ class AdamsBrain:
     Parameters
     ----------
     model : str
-        Groq model identifier to use for completions.
+        Groq model identifier.
     temperature : float
         Sampling temperature (lower = more deterministic / consistent).
     max_tokens : int
@@ -88,9 +106,9 @@ class AdamsBrain:
 
     def __init__(
         self,
-        model: str = "llama-3.3-70b-versatile",
-        temperature: float = 0.3,
-        max_tokens: int = 150,
+        model: str       = "llama-3.3-70b-versatile",
+        temperature: float = 0.25,
+        max_tokens: int  = 160,
     ) -> None:
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
@@ -99,10 +117,15 @@ class AdamsBrain:
                 "Add it to your .env file in the project root."
             )
 
-        self.client = Groq(api_key=api_key)
-        self.model = model
+        self.client      = Groq(api_key=api_key)
+        self.model       = model
         self.temperature = temperature
-        self.max_tokens = max_tokens
+        self.max_tokens  = max_tokens
+
+        # Rolling history of the last N telemetry snapshots for context
+        self._history: list[dict] = []
+        self._max_history: int    = 4
+
         logger.info("AdamsBrain ready (model=%s).", self.model)
 
     # ------------------------------------------------------------------
@@ -125,37 +148,63 @@ class AdamsBrain:
             suggested_route.  Falls back to a safe default on any error.
         """
         if not driver_state:
-            return self._default_response("INFO", "Scanning environment.", False, "FASTEST")
-
-        if isinstance(driver_state, dict):
-            driver_state = json.dumps(driver_state)
-
-        if len(driver_state.strip()) < 3:
-            return self._default_response("INFO", "Scanning environment.", False, "FASTEST")
-
-        try:
-            completion = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": _SYSTEM_PROMPT},
-                    {"role": "user",   "content": f"Driver Telemetry: {driver_state}"},
-                ],
-                response_format={"type": "json_object"},
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
+            return self._default_response(
+                "INFO", "Scanning environment.", False, "FASTEST"
             )
 
-            raw: str = completion.choices[0].message.content
-            return self._validate_response(raw)
+        if isinstance(driver_state, dict):
+            driver_state = json.dumps(driver_state, ensure_ascii=False)
 
-        except Exception:
-            logger.exception("Groq API call failed")
-            return self._default_response("ERROR", "Safety AI offline.", False, "FASTEST")
+        if len(driver_state.strip()) < 3:
+            return self._default_response(
+                "INFO", "Scanning environment.", False, "FASTEST"
+            )
 
-    def filter_notification(self, driver_level: AlertLevel, notification_text: str) -> str:
+        # Build context-aware message list
+        messages = self._build_messages(driver_state)
+
+        last_exc: Exception | None = None
+
+        for attempt in range(1, _MAX_RETRIES + 1):
+            try:
+                completion = self.client.chat.completions.create(
+                    model           = self.model,
+                    messages        = messages,
+                    response_format = {"type": "json_object"},
+                    temperature     = self.temperature,
+                    max_tokens      = self.max_tokens,
+                )
+
+                raw: str = completion.choices[0].message.content
+                validated = self._validate_response(raw)
+
+                # Store in rolling history
+                self._push_history(driver_state, validated)
+
+                return validated
+
+            except Exception as exc:
+                last_exc = exc
+                logger.warning(
+                    "Groq API attempt %d/%d failed: %s",
+                    attempt, _MAX_RETRIES, exc,
+                )
+                if attempt < _MAX_RETRIES:
+                    time.sleep(_RETRY_DELAY)
+
+        logger.error("All Groq retries exhausted. Last error: %s", last_exc)
+        return self._default_response(
+            "ERROR", "Safety AI offline.", False, "FASTEST"
+        )
+
+    def filter_notification(
+        self,
+        driver_level: AlertLevel,
+        notification_text: str,
+    ) -> str:
         """
-        Focus-mode guard: suppress incoming notifications when the driver is
-        in a high-risk state.
+        Focus-mode guard: suppress incoming notifications when the driver
+        is in a high-risk state.
 
         Parameters
         ----------
@@ -174,9 +223,50 @@ class AdamsBrain:
             return "[BLOCKED] High-risk state: focus on the road."
         return f"[ALLOWED] {notification_text}"
 
+    def clear_history(self) -> None:
+        """Wipe the rolling telemetry history (e.g. between sessions)."""
+        self._history.clear()
+        logger.debug("Telemetry history cleared.")
+
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    def _build_messages(self, current_telemetry: str) -> list[dict]:
+        """
+        Construct the full message list for the API call, prepending recent
+        telemetry context so the model can detect trends (e.g. worsening).
+        """
+        messages: list[dict] = [
+            {"role": "system", "content": _SYSTEM_PROMPT}
+        ]
+
+        # Add previous turns as context (oldest first)
+        for entry in self._history:
+            messages.append({
+                "role":    "user",
+                "content": f"Driver Telemetry: {entry['telemetry']}",
+            })
+            messages.append({
+                "role":    "assistant",
+                "content": entry["response"],
+            })
+
+        # Add current turn
+        messages.append({
+            "role":    "user",
+            "content": f"Driver Telemetry: {current_telemetry}",
+        })
+
+        return messages
+
+    def _push_history(self, telemetry: str, response: str) -> None:
+        """Append a telemetry/response pair and trim to the rolling window."""
+        self._history.append(
+            {"telemetry": telemetry, "response": response}
+        )
+        if len(self._history) > self._max_history:
+            self._history.pop(0)
 
     def _validate_response(self, raw: str) -> str:
         """
@@ -186,15 +276,36 @@ class AdamsBrain:
         try:
             parsed: dict = json.loads(raw)
         except json.JSONDecodeError:
-            logger.warning("Brain returned non-JSON content: %r", raw[:120])
-            return self._default_response("WARNING", "Check driver status.", False, "FASTEST")
+            logger.warning(
+                "Brain returned non-JSON content: %r", raw[:120]
+            )
+            return self._default_response(
+                "WARNING", "Check driver status.", False, "FASTEST"
+            )
 
         missing = _REQUIRED_KEYS - parsed.keys()
         if missing:
-            logger.warning("Brain JSON missing keys %s: %s", missing, parsed)
-            return self._default_response("WARNING", "Check driver status.", False, "FASTEST")
+            logger.warning(
+                "Brain JSON missing keys %s: %s", missing, parsed
+            )
+            return self._default_response(
+                "WARNING", "Check driver status.", False, "FASTEST"
+            )
 
-        return raw
+        # Sanitise values to allowed ranges
+        allowed_levels  = {"INFO", "WARNING", "DANGER", "ERROR"}
+        allowed_routes  = {"FASTEST", "SCENIC", "REST_STOP"}
+
+        if parsed.get("level") not in allowed_levels:
+            parsed["level"] = "WARNING"
+        if parsed.get("suggested_route") not in allowed_routes:
+            parsed["suggested_route"] = "FASTEST"
+        if not isinstance(parsed.get("buzzer_active"), bool):
+            parsed["buzzer_active"] = parsed.get("level") == "DANGER"
+        if not isinstance(parsed.get("message"), str) or not parsed["message"].strip():
+            parsed["message"] = "Stay alert."
+
+        return json.dumps(parsed, ensure_ascii=False)
 
     @staticmethod
     def _default_response(
@@ -206,11 +317,12 @@ class AdamsBrain:
         """Return a pre-built fallback JSON string (no API call required)."""
         return json.dumps(
             {
-                "level": level,
-                "message": message,
-                "buzzer_active": buzzer_active,
+                "level":          level,
+                "message":        message,
+                "buzzer_active":  buzzer_active,
                 "suggested_route": suggested_route,
-            }
+            },
+            ensure_ascii=False,
         )
 
 
@@ -223,17 +335,19 @@ if __name__ == "__main__":
     print("🧠 ADAMS Brain — smoke test\n" + "-" * 60)
 
     test_cases = [
-        "Eye openness: 5%, Drowsy: True, Emotion: Tired, Confidence: 92%",
-        "Eye openness: 85%, Drowsy: False, Emotion: Angry, Confidence: 78%",
-        "Eye openness: 95%, Drowsy: False, Emotion: Happy, Confidence: 88%",
+        "Eye openness: 5%,  Drowsy: True,  Emotion: Tired,   Confidence: 92%",
+        "Eye openness: 85%, Drowsy: False, Emotion: Angry,   Confidence: 78%",
+        "Eye openness: 95%, Drowsy: False, Emotion: Happy,   Confidence: 88%",
+        "Eye openness: 40%, Drowsy: True,  Emotion: Neutral, Confidence: 65%",
     ]
 
     for case in test_cases:
         response = brain.generate_advice(case)
-        data = json.loads(response)
+        data     = json.loads(response)
         print(
             f"INPUT  : {case}\n"
             f"OUTPUT : [{data['level']}] {data['message']} | "
-            f"Buzzer: {data['buzzer_active']} | Route: {data['suggested_route']}\n"
+            f"Buzzer: {data['buzzer_active']} | "
+            f"Route: {data['suggested_route']}\n"
             + "-" * 60
         )
