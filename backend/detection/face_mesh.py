@@ -65,7 +65,7 @@ class EyeDetector:
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model not found at '{model_path}'. Check filename!")
 
-        self.ear_threshold = ear_threshold
+        self.ear_threshold = 0.15
         self.closed_frames_threshold = closed_frames_threshold
         self.yaw_threshold_deg = yaw_threshold_deg
         self.distracted_frames_threshold = distracted_frames_threshold
